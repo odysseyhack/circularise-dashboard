@@ -1,13 +1,19 @@
-import { CardContent, TextField, Card, Tabs, Tab, Button } from '@material-ui/core';
+import { CardContent, TextField, Card, Tabs, Tab, Button, Select, OutlinedInput, MenuItem, InputLabel, FormControl } from '@material-ui/core';
 import React, { PureComponent } from 'react';
 import { RouteComponentProps } from 'react-router';
 
+import { Roles } from '../enums/Roles';
 import styles from '../styles/login-page.module.scss';
 
 type Props = RouteComponentProps;
 
 type State = {
   tabValue: TabValue;
+  role: Roles;
+  username?: string;
+  firstname?: string;
+  lastname?: string;
+  password?: string;
 };
 
 enum TabValue {
@@ -21,39 +27,84 @@ export class LoginPage extends PureComponent<Props, State> {
 
     this.state = {
       tabValue: TabValue.LOGIN,
+      role: Roles.BUIDLER,
     };
   }
 
-  private handleChange = (_: React.ChangeEvent<{}>, value: TabValue) => {
+  private handleTabChange = (_: React.ChangeEvent<{}>, value: TabValue) => {
     this.setState({
       tabValue: value,
     });
   }
 
+  private handleRoleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    this.setState({ role: event.target.value as Roles });
+  }
+
+  private handleFieldChange(field: keyof State) {
+    return (event: React.ChangeEvent<HTMLInputElement>) => {
+      this.setState({ [field]: event.target.value } as any);
+    };
+  }
+
   private handleSubmit = async () => {
-    if (this.state.tabValue === TabValue.REGISTER) {
-      try {
+    const { username, firstname, lastname, role, password } = this.state;
+
+    try {
+      if (this.state.tabValue === TabValue.REGISTER) {
         await fetch('http://35.180.111.132:9000/register', {
           method: 'POST',
           headers: {
             'Content-type': 'application/json',
           },
-          body: JSON.stringify({ userName: 'test@test.nl' }),
+          body: JSON.stringify({
+            username,
+            firstname,
+            lastname,
+            role,
+            password,
+          }),
         });
-      } catch (e) {
-        console.log(`Failed registering: ${e}`);
       }
 
-      return;
-    }
+      await fetch('http://35.180.111.132:9000/login', {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
 
-    this.props.history.push('/home');
+      this.props.history.push('/home');
+    } catch (e) {
+      console.log(`Failed registering: ${e}`);
+    }
   }
 
   private renderLoginInput() {
     return (
       <div>
-        <TextField fullWidth label="Username" variant="outlined" margin="normal" />
+        {/* Username */}
+        <TextField
+          fullWidth
+          label="Username"
+          variant="outlined"
+          margin="normal"
+          onChange={this.handleFieldChange('username')}
+        />
+
+        {/* Password */}
+        <TextField
+          fullWidth
+          type="password"
+          label="Password"
+          variant="outlined"
+          margin="normal"
+          onChange={this.handleFieldChange('password')}
+        />
       </div>
     );
   }
@@ -61,11 +112,63 @@ export class LoginPage extends PureComponent<Props, State> {
   private renderRegisterInput() {
     return (
       <div>
-        <TextField fullWidth label="Username" variant="outlined" margin="normal" />
+        {/* Username */}
+        <TextField
+          fullWidth
+          label="Username"
+          variant="outlined"
+          margin="normal"
+          onChange={this.handleFieldChange('username')}
+        />
 
-        <TextField fullWidth label="Firstname" variant="outlined" margin="normal" />
+        {/* Role */}
+        <FormControl fullWidth variant="outlined" margin="normal">
+          <InputLabel htmlFor="role">Role</InputLabel>
 
-        <TextField fullWidth label="Lastname" variant="outlined" margin="normal" />
+          <Select
+            value={this.state.role}
+            onChange={this.handleRoleChange}
+            input={
+              <OutlinedInput
+                labelWidth={35}
+                name="role"
+                id="role"
+              />
+            }
+          >
+            <MenuItem value={Roles.BUIDLER}>Buidler</MenuItem>
+            <MenuItem value={Roles.INVESTOR}>Investor</MenuItem>
+            <MenuItem value={Roles.GOVERNOR}>Governor</MenuItem>
+          </Select>
+        </FormControl>
+
+        {/* Password */}
+        <TextField
+          fullWidth
+          type="password"
+          label="Password"
+          variant="outlined"
+          margin="normal"
+          onChange={this.handleFieldChange('password')}
+        />
+
+        {/* Firstname */}
+        <TextField
+          fullWidth
+          label="Firstname"
+          variant="outlined"
+          margin="normal"
+          onChange={this.handleFieldChange('firstname')}
+        />
+
+        {/* Lastname */}
+        <TextField
+          fullWidth
+          label="Lastname"
+          variant="outlined"
+          margin="normal"
+          onChange={this.handleFieldChange('lastname')}
+        />
       </div>
     );
   }
@@ -74,7 +177,7 @@ export class LoginPage extends PureComponent<Props, State> {
     return (
       <div className={styles['login-page']}>
         <Card className={styles.card}>
-          <Tabs className={styles.tabs} variant="fullWidth" value={this.state.tabValue} onChange={this.handleChange}>
+          <Tabs className={styles.tabs} variant="fullWidth" value={this.state.tabValue} onChange={this.handleTabChange}>
             <Tab label="Login" value={TabValue.LOGIN} />
             <Tab label="Register" value={TabValue.REGISTER} />
           </Tabs>
