@@ -5,5 +5,5 @@ languages:
 - name: typescript
   production:
     include:
-      - .*/.tsx
-      - .*/.ts
+      - .*\.tsx
+      - .*\.ts
