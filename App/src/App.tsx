@@ -22,13 +22,15 @@ type State = {
   takeoverPeriod: number;
   trFee: number;
   trCosts: number;
-  multiplier: number;
+  discounter: number;
   maxMultiplier: number;
-  multiplierDiscounter: number;
-  investment: number;
-  investmentDiscounter: number;
   maturityRate: number;
-  returnReceived: number;
+  investors: Array<{
+    investment: number;
+    multiplier: number;
+    startingMonth: number;
+    returnReceived: number;
+  }>;
 };
 
 class App extends PureComponent<Props, State> {
@@ -41,20 +43,46 @@ class App extends PureComponent<Props, State> {
       curviness: 500,
       startOfFastGrowth: 10,
       takeoverPeriod: 24,
-      trFee: 0.1,
-      trCosts: 0.01,
-      multiplier: 4,
+      trCosts: 0.1,
+      trFee: 0.15,
       maxMultiplier: 10,
-      multiplierDiscounter: 1,
-      investment: 100000,
-      investmentDiscounter: 1,
       maturityRate: 1000,
-      returnReceived: 0,
+      discounter: 0.5,
+      investors: [
+        {
+          investment: 100000,
+          multiplier: 4,
+          startingMonth: 0,
+          returnReceived: 0,
+        },
+        {
+          investment: 100000,
+          multiplier: 4,
+          startingMonth: 6,
+          returnReceived: 0,
+        },
+        {
+          investment: 100000,
+          multiplier: 4,
+          startingMonth: 0,
+          returnReceived: 0,
+        },
+      ],
     };
   }
 
   private handleChange = (field: keyof State, val: any) => {
     this.setState({ [field]: val } as any);
+  }
+
+  private handleInvestorChange = (investor: number, field: keyof State, val: any) => {
+    const investors = [...this.state.investors];
+    Object.assign(investors[investor], { [field]: val });
+
+    this.setState({
+      ...this.state,
+      investors,
+    });
   }
 
   private calcAdoption(t: number) {
@@ -82,25 +110,15 @@ class App extends PureComponent<Props, State> {
     const {
       trFee,
       trCosts,
-      multiplier,
-      maxMultiplier,
-      multiplierDiscounter,
-      investment,
-      investmentDiscounter,
-      maturityRate,
-      returnReceived,
+      investors,
     } = this.state;
 
+    let endGoal = investors.reduce((prev, curr) => prev + curr.investment * curr.multiplier, 0);
     let t = 0;
-    let endGoal = investment * multiplier - returnReceived;
     const curve: number[] = [];
 
     while (endGoal > 0) {
       const ac = this.calcAdoption(t);
-      const t1 = (maxMultiplier - multiplier) * multiplierDiscounter;
-      const t2 = investment * investmentDiscounter;
-      const t3 = t * maturityRate;
-      const investmentWeight = t1 * t2 + t3;
 
       const res = (trFee - trCosts) * ac;
 
@@ -112,9 +130,55 @@ class App extends PureComponent<Props, State> {
     return curve;
   }
 
+  private investorsCurve(months: number) {
+    const { trFee, trCosts, discounter, maxMultiplier, maturityRate, investors } = this.state;
+
+    const endGoals = investors.map((investor) => investor.multiplier * investor.investment);
+    const investorCurves: number[][] = investors.map(() => []);
+
+    const multiplierDiscounter = Math.max(0.1, 1 - discounter);
+    const investmentDiscounter = Math.max(0.1, discounter);
+
+    for (let month = 0; month < months; month++) {
+      const allWeights = investors
+        .filter((investor, i) => endGoals[i] > 0 && month >= investor.startingMonth - 1)
+        .reduce((prev, curr) => {
+          const t1 = (maxMultiplier - curr.multiplier) * multiplierDiscounter;
+          const t2 = curr.investment * investmentDiscounter;
+          const t3 = month * maturityRate;
+          const investmentWeight = t1 * t2 + t3;
+
+          return prev + investmentWeight;
+        }, 0);
+
+      investors.forEach((investor, i) => {
+        if (month < investor.startingMonth - 1 || endGoals[i] <= 0) {
+          investorCurves[i].push(0);
+
+          return;
+        }
+
+        const ac = this.calcAdoption(month);
+        const t1 = (maxMultiplier - investor.multiplier) * multiplierDiscounter;
+        const t2 = investor.investment * investmentDiscounter;
+        const t3 = month * maturityRate;
+        const investmentWeight = t1 * t2 + t3;
+        const weightShare = investmentWeight / allWeights;
+
+        const res = (trFee - trCosts) * ac * weightShare;
+
+        endGoals[i] -= res;
+        investorCurves[i].push(res);
+      });
+    }
+
+    return investorCurves;
+  }
+
   public render() {
     const d1 = this.adoptionCurve();
     const d2 = this.returnOnInvestmentCurve();
+    const d3 = this.investorsCurve(d2.length);
 
     return (
       <div className={styles.app}>
@@ -142,15 +206,30 @@ class App extends PureComponent<Props, State> {
               <Line
                 options={{ maintainAspectRatio: true }}
                 data={{
+                  // labels: [...Array(Math.max(...d2.map((d) => d.length)))].map((_, i) => i),
                   labels: d2.map((_, i) => i),
                   datasets: [
                     {
                       label: 'Return On Investment',
                       lineTension: 0.1,
                       borderColor: '#4E97D5',
+                      backgroundColor: 'rgba(0,0,0,0)',
                       data: d2,
                     },
+                    ...d3.map((d, index) => ({
+                      label: `Investor ${index + 1}`,
+                      lineTension: 0.1,
+                      borderColor: `#9${index * 9}F`,
+                      backgroundColor: 'rgba(0,0,0,0)',
+                      data: d,
+                    })),
                   ],
+                  // datasets: d2.map((d, index) => ({
+                  //   label: `Investor ${index + 1}`,
+                  //   lineTension: 0.1,
+                  //   borderColor: `#9${index * 9}F`,
+                  //   data: d,
+                  // })),
                 }}
               />
             </CardContent>
@@ -158,7 +237,11 @@ class App extends PureComponent<Props, State> {
         </main>
 
         {/* Return On Investment Drawer */}
-        <ReturnOnInvestmentCard onChange={this.handleChange as any} {...this.state} />
+        <ReturnOnInvestmentCard
+          onChange={this.handleChange as any}
+          onInvestorChange={this.handleInvestorChange as any}
+          {...this.state}
+        />
       </div>
     );
   }

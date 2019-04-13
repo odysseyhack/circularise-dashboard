@@ -3,6 +3,7 @@ import {
   List,
   ListItem,
   FormLabel,
+  Typography,
 } from '@material-ui/core';
 import React, { PureComponent } from 'react';
 
@@ -27,6 +28,8 @@ export class AdoptionCurveCard extends PureComponent<Props> {
     return (
       <Card className={styles.card}>
         <List>
+          <ListItem><Typography>Adoption Curve</Typography></ListItem>
+
           <ListItem className={styles.label}>
             <FormLabel>Current Transactions/month</FormLabel>
           </ListItem>
@@ -46,11 +49,11 @@ export class AdoptionCurveCard extends PureComponent<Props> {
           />
 
           <ListItem className={styles.label}>
-            <FormLabel>Adoption curve</FormLabel>
+            <FormLabel>Curviness</FormLabel>
           </ListItem>
 
           <SliderParameter
-            min={1}
+            min={10}
             max={3000}
             value={curviness}
             onChange={(val) => { onChange('curviness', val); }}
@@ -73,7 +76,7 @@ export class AdoptionCurveCard extends PureComponent<Props> {
 
           <SliderParameter
             min={1}
-            max={36}
+            max={60}
             value={takeoverPeriod}
             onChange={(val) => { onChange('takeoverPeriod', val); }}
           />

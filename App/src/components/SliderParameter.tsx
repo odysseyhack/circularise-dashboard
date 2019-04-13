@@ -13,30 +13,19 @@ type Props = {
 };
 
 type State = {
-  min: number;
-  max: number;
+  min?: number;
+  max?: number;
 };
 
 export class SliderParameter extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    this.state = {
-      min: 0,
-      max: 10,
-    };
+    this.state = {};
   }
 
   private handleMinMax(field: 'min' | 'max') {
     return (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (field === 'min' && Number(event.target.value) >= this.state.max) {
-        return;
-      }
-
-      if (field === 'max' && Number(event.target.value) <= this.state.min) {
-        return;
-      }
-
       this.setState({ [field]: Number(event.target.value) } as any);
     };
   }
@@ -54,8 +43,11 @@ export class SliderParameter extends PureComponent<Props, State> {
 
   public render() {
     const { value, step, onChange } = this.props;
-    const min = this.props.min !== undefined ? this.props.min : this.state.min;
-    const max = this.props.max !== undefined ? this.props.max : this.state.max;
+    const min = this.state.min !== undefined ?
+      this.state.min : this.props.min !== undefined ? this.props.min : 0;
+
+    const max = this.state.max !== undefined ?
+      this.state.max : this.props.max !== undefined ? this.props.max : 10;
 
     return (
       <ListItem>
