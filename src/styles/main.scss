@@ -12,3 +12,13 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.rc-slider {
+  &-track {
+    background-color: red !important;
+  }
+
+  &-handle {
+    border-color: red !important;
+  }
+}
