@@ -1,2 +1,4 @@
 exclude:
-- /public/.*
+- /App/public/.*
+- /App/src/index.ts
+- /App/src/serviceWorker.ts
