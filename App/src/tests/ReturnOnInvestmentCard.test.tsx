@@ -10,14 +10,12 @@ it('renders without crashing', () => {
     <ReturnOnInvestmentCard
       trFee={10}
       trCosts={10}
-      multiplier={2}
-      multiplierDiscounter={10}
       maxMultiplier={4}
-      investment={10}
-      investmentDiscounter={10}
+      discounter={2}
       maturityRate={10}
-      returnReceived={10}
+      investors={[{ investment: 1, multiplier: 2, startingMonth: 1, returnReceived: 3 }]}
       onChange={(val) => { }}
+      onInvestorChange={(investor, field, val) => { }}
     />, div);
   ReactDOM.unmountComponentAtNode(div);
 });

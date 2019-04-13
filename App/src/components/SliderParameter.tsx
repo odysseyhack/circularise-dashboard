@@ -53,15 +53,7 @@ export class SliderParameter extends PureComponent<Props, State> {
       <ListItem>
         <TextField type="number" variant="outlined" value={min} onChange={this.handleMinMax('min')} />
 
-        <Slider
-          className={styles.slider}
-          min={min}
-          max={max}
-          step={step}
-          defaultValue={value}
-          handle={this.renderHandle}
-          onAfterChange={onChange}
-        />
+        <Slider className={styles.slider} min={min} max={max} step={step} defaultValue={value} handle={this.renderHandle} onAfterChange={onChange} />
 
         <TextField type="number" variant="outlined" value={max} onChange={this.handleMinMax('max')} />
       </ListItem>

@@ -48,6 +48,21 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
     };
   }
 
+  private renderLabel(label: string) {
+    return (
+      <ListItem className={styles.label}>
+        <FormLabel>{label}</FormLabel>
+      </ListItem>
+    );
+  }
+  private renderTitle(text: string) {
+    return (
+      <ListItem className={styles.label}>
+        <Typography>{text}</Typography>
+      </ListItem>
+    );
+  }
+
   public render() {
     const {
       trFee,
@@ -63,33 +78,17 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
     return (
       <Card className={cx(styles.card, 'alternative-sliders')}>
         <List>
-          <ListItem><Typography>Return On Investment</Typography></ListItem>
+          {this.renderTitle('Transaction Parameters')}
+          {this.renderLabel('Transaction Costs')}
 
-          <ListItem className={styles.label}>
-            <FormLabel>Transaction Costs</FormLabel>
-          </ListItem>
+          <SliderParameter value={trCosts} max={trFee - 0.001} step={0.001} onChange={(val) => { onChange('trCosts', val); }} />
 
-          <SliderParameter
-            value={trCosts}
-            max={trFee - 0.001}
-            step={0.001}
-            onChange={(val) => { onChange('trCosts', val); }}
-          />
+          {this.renderLabel('Transaction Fee')}
 
-          <ListItem className={styles.label}>
-            <FormLabel>Transaction Fee</FormLabel>
-          </ListItem>
-
-          <SliderParameter
-            value={trFee}
-            min={trCosts}
-            max={2}
-            step={0.001}
-            onChange={(val) => { onChange('trFee', val); }}
-          />
+          <SliderParameter value={trFee} min={trCosts} max={2} step={0.001} onChange={(val) => { onChange('trFee', val); }} />
 
           <Divider />
-
+          {this.renderTitle('Protocol Parameters')}
           <ListItem style={{ paddingBottom: 0, justifyContent: 'center' }}>
             <FormLabel>Weight based on</FormLabel>
           </ListItem>
@@ -99,75 +98,37 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
             <FormLabel>Multiplier</FormLabel>
           </ListItem>
 
-          <StepParameter
-            step={0.1}
-            value={discounter}
-            onChange={(val) => { onChange('discounter', val); }}
-          />
+          <StepParameter step={0.1} value={discounter} onChange={(val) => { onChange('discounter', val); }} />
 
-          <ListItem className={styles.label}>
-            <FormLabel>Maturity Rate (month)</FormLabel>
-          </ListItem>
+          {this.renderLabel('Maturity Rate per month')}
 
-          <InputParamater
-            value={maturityRate}
-            onChange={(val) => { onChange('maturityRate', val); }}
-          />
 
-          <ListItem className={styles.label}>
-            <FormLabel>Max Multiplier</FormLabel>
-          </ListItem>
+          <InputParamater value={maturityRate} onChange={(val) => { onChange('maturityRate', val); }} />
 
-          <InputParamater
-            value={maxMultiplier}
-            onChange={(val) => { onChange('maxMultiplier', val); }}
-          />
+          {this.renderLabel('Max Multiplier')};
+
+          <InputParamater value={maxMultiplier} onChange={(val) => { onChange('maxMultiplier', val); }} />
 
           <Divider />
+          {this.renderTitle('Investors')}
 
-          <Tabs
-            variant="fullWidth"
-            value={this.state.selectedInvestor}
-            onChange={(_, val) => { this.setState({ selectedInvestor: val }); }}
-          >
-            {investors.map((_, i) => (
-              <Tab key={i} label={`Investor ${i + 1}`} />
-            ))}
+          <Tabs variant="fullWidth" value={this.state.selectedInvestor} onChange={(_, val) => { this.setState({ selectedInvestor: val }); }}>
+            {investors.map((_, i) => (<Tab key={i} label={`Investor ${i + 1}`} />))}
           </Tabs>
 
           {investors.map((investor, i) => (
             this.state.selectedInvestor === i && <div key={i}>
-              <ListItem className={styles.label}>
-                <FormLabel>Starting Month</FormLabel>
-              </ListItem>
+              {this.renderLabel('Starting Month')}
 
-              <InputParamater
-                value={investor.startingMonth}
-                onChange={(val) => { onInvestorChange(i, 'startingMonth', val); }}
-              />
+              <InputParamater value={investor.startingMonth} onChange={(val) => { onInvestorChange(i, 'startingMonth', val); }} />
 
-              <ListItem className={styles.label}>
-                <FormLabel>Investment</FormLabel>
-              </ListItem>
+              {this.renderLabel('Investment')}
 
-              <SliderParameter
-                min={10000}
-                max={1000000}
-                step={10000}
-                value={investor.investment}
-                onChange={(val) => { onInvestorChange(i, 'investment', val); }}
-              />
+              <SliderParameter min={10000} max={1000000} step={10000} value={investor.investment} onChange={(val) => { onInvestorChange(i, 'investment', val); }} />
 
-              <ListItem className={styles.label}>
-                <FormLabel>Multiplier</FormLabel>
-              </ListItem>
+              {this.renderLabel('Multiplier')}
 
-              <SliderParameter
-                value={investor.multiplier}
-                min={1}
-                max={maxMultiplier}
-                onChange={(val) => { onInvestorChange(i, 'multiplier', val); }}
-              />
+              <SliderParameter value={investor.multiplier} min={1} max={maxMultiplier} onChange={(val) => { onInvestorChange(i, 'multiplier', val); }} />
             </div>
           ))}
         </List>

@@ -1,4 +1,4 @@
-import { ListItem, ListItemIcon, Radio } from '@material-ui/core';
+import { ListItem } from '@material-ui/core';
 import Slider from 'rc-slider';
 import React, { PureComponent } from 'react';
 
@@ -16,15 +16,7 @@ export class StepParameter extends PureComponent<Props> {
 
     return (
       <ListItem>
-        <Slider
-          max={1}
-          step={step}
-          value={value}
-          onChange={onChange}
-          marks={{
-            0.5: '0',
-          }}
-        />
+        <Slider max={1} step={step} value={value} onChange={onChange} marks={{ 0.5: '0' }} />
       </ListItem>
     );
   }
