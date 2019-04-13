@@ -1,15 +1,5 @@
 component_depth: 3
-
-production:
-    exclude:
-      - /App/public/.*
-      - /App/src/index\.tsx
-      - /App/src/serviceWorker\.ts
-test:
-    exclude:
-      - /App/public/.*
-      - /App/src/index\.tsx
-      - /App/src/serviceWorker\.ts
-
-    include:
-        - .*\.tsx
+exclude:
+  - /App/public/.*
+  - /App/src/index.tsx
+  - /App/src/serviceWorker.ts
