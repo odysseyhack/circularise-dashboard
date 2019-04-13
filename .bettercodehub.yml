@@ -2,6 +2,7 @@ component_depth: 3
 
 exclude:
 - /App/src/serviceWorker.ts
+- /App/src/react-app-env.d.ts
 - /App/src/index.tsx
 
 languages:
