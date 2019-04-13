@@ -2,6 +2,7 @@ component_depth: 3
 
 exclude:
 - /App/src/serviceWorker.ts
+- /App/src/index.tsx
 
 languages:
 - name: typescript
