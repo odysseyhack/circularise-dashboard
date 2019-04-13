@@ -1,48 +1,32 @@
 import {
-  StyledComponentProps,
-  WithTheme,
   Card,
   CardContent,
-  Drawer,
-  List,
-  withStyles,
-  IconButton,
-  Divider,
-  AppBar,
-  Toolbar,
-  Typography,
-  ListItem,
-  FormLabel,
 } from '@material-ui/core';
-import {
-  Menu as MenuIcon,
-  ChevronLeft as ChevronLeftIcon,
-  ChevronRight as ChevronRightIcon,
-} from '@material-ui/icons';
-import cx from 'classnames';
 import 'rc-slider/assets/index.css';
 import React, { PureComponent } from 'react';
 import { Line } from 'react-chartjs-2';
 
-import { InputParamater } from './components/InputParamter';
-import { SelectParameter } from './components/SelectParameter';
-import { SliderParameter } from './components/SliderParameter';
-import { StepParameter } from './components/StepParameter';
+import { AdoptionCurveCard } from './components/AdoptionCurveCard';
+import { ReturnOnInvestmentCard } from './components/ReturnOnInvestmentCard';
 import styles from './styles/app.module.scss';
 
-type Props = StyledComponentProps & WithTheme;
+type Props = {};
 
 type State = {
-  drawerOpen: boolean;
-  selectedParameter: keyof State;
   trCurrent: number;
   trMaxAdoption: number;
   curviness: number;
   startOfFastGrowth: number;
   takeoverPeriod: number;
-  x2: string;
-  x3: number;
-  x4: number;
+  trFee: number;
+  trCosts: number;
+  multiplier: number;
+  maxMultiplier: number;
+  multiplierDiscounter: number;
+  investment: number;
+  investmentDiscounter: number;
+  maturityRate: number;
+  returnReceived: number;
 };
 
 class App extends PureComponent<Props, State> {
@@ -50,35 +34,25 @@ class App extends PureComponent<Props, State> {
     super(props);
 
     this.state = {
-      drawerOpen: true,
-      selectedParameter: 'trCurrent',
       trCurrent: 10,
       trMaxAdoption: 10000,
       curviness: 500,
       startOfFastGrowth: 10,
       takeoverPeriod: 24,
-      x2: 'year',
-      x3: 5,
-      x4: 8,
+      trFee: 0.01,
+      trCosts: 0.1,
+      multiplier: 4,
+      maxMultiplier: 10,
+      multiplierDiscounter: 1,
+      investment: 100000,
+      investmentDiscounter: 1,
+      maturityRate: 1000,
+      returnReceived: 0,
     };
   }
 
-  private handleChange(field: keyof State) {
-    return (val: any) => {
-      this.setState({ [field]: val } as any);
-    };
-  }
-
-  private handleSelection(field: keyof State) {
-    return () => {
-      this.setState({ selectedParameter: field });
-    };
-  }
-
-  private toggleDrawer(state: boolean) {
-    return () => {
-      this.setState({ drawerOpen: state });
-    };
+  private handleChange = (field: keyof State, val: any) => {
+    this.setState({ [field]: val } as any);
   }
 
   private adoptionCurve() {
@@ -96,127 +70,39 @@ class App extends PureComponent<Props, State> {
     return curve;
   }
 
-  public render() {
-    const { classes, theme } = this.props;
+  private returnOnInvestment(adoptionCurve: number[]) {
+    const {
+      trFee,
+      trCosts,
+      multiplier,
+      maxMultiplier,
+      multiplierDiscounter,
+      investment,
+      investmentDiscounter,
+      maturityRate,
+      returnReceived,
+    } = this.state;
 
+    return adoptionCurve.map((ac, t) => {
+      const t1 = (maxMultiplier - multiplier) * multiplierDiscounter;
+      const t2 = investment * investmentDiscounter;
+      const t3 = t * maturityRate;
+      const investmentWeight = t1 * t2 + t3;
+
+      return investmentWeight * (investment * multiplier - returnReceived) / (trFee * trCosts * ac);
+    });
+  }
+
+  public render() {
     const d1 = this.adoptionCurve();
-    // const d1 = [...Array(12)].map((_, i) => Math.pow(i, 2));
-    const d2 = d1.map((v, i) => v + i * this.state.trCurrent);
-    const d3 = d2.map((v, i) => v + i * this.state.x3);
+    const d2 = this.returnOnInvestment(d1);
 
     return (
       <div className={styles.app}>
-        <AppBar
-          position="fixed"
-          className={cx(classes!.appBar, {
-            [classes!.appBarShift!]: this.state.drawerOpen,
-          })}
-        >
-          <Toolbar disableGutters={!this.state.drawerOpen}>
-            <IconButton
-              color="inherit"
-              aria-label="Open drawer"
-              onClick={this.toggleDrawer(true)}
-              className={cx(styles['menu-button'], {
-                [styles['is-hidden']]: this.state.drawerOpen,
-              })}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" color="inherit" noWrap>
-              Circularise Odyssey Dashboard
-            </Typography>
-          </Toolbar>
-        </AppBar>
+        {/* Adoption Curve Drawer */}
+        <AdoptionCurveCard onChange={this.handleChange as any} {...this.state} />
 
-        <Drawer
-          className={classes!.drawer}
-          variant="persistent"
-          open={this.state.drawerOpen}
-          classes={{ paper: classes!.drawerPaper }}
-          onClose={this.toggleDrawer(false)}
-        >
-          <div className={styles['drawer-header']}>
-            <IconButton onClick={this.toggleDrawer(false)}>
-              {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-            </IconButton>
-          </div>
-
-          <Divider />
-
-          <List>
-            <ListItem className={styles.label}>
-              <FormLabel>Current Transactions/month</FormLabel>
-            </ListItem>
-
-            <InputParamater
-              checked={this.state.selectedParameter === 'trCurrent'}
-              value={this.state.trCurrent}
-              onChange={this.handleChange('trCurrent')}
-              onSelect={this.handleSelection('trCurrent')}
-            />
-
-            <Divider />
-
-            <ListItem className={styles.label}>
-              <FormLabel>Max Transactions/month</FormLabel>
-            </ListItem>
-
-            <InputParamater
-              checked={this.state.selectedParameter === 'trMaxAdoption'}
-              value={this.state.trMaxAdoption}
-              onChange={this.handleChange('trMaxAdoption')}
-              onSelect={this.handleSelection('trMaxAdoption')}
-            />
-
-            <Divider />
-
-            <ListItem className={styles.label}>
-              <FormLabel>Adoption curve</FormLabel>
-            </ListItem>
-
-            <SliderParameter
-              checked={this.state.selectedParameter === 'curviness'}
-              min={1}
-              max={3000}
-              value={this.state.curviness}
-              onChange={this.handleChange('curviness')}
-              onSelect={this.handleSelection('curviness')}
-            />
-
-            <Divider />
-
-            <ListItem className={styles.label}>
-              <FormLabel>Start Month Of Fast Growth</FormLabel>
-            </ListItem>
-
-            <SliderParameter
-              checked={this.state.selectedParameter === 'startOfFastGrowth'}
-              min={1}
-              max={36}
-              value={this.state.startOfFastGrowth}
-              onChange={this.handleChange('startOfFastGrowth')}
-              onSelect={this.handleSelection('startOfFastGrowth')}
-            />
-
-            <Divider />
-
-            <ListItem className={styles.label}>
-              <FormLabel>Takeover Period</FormLabel>
-            </ListItem>
-
-            <SliderParameter
-              checked={this.state.selectedParameter === 'takeoverPeriod'}
-              min={1}
-              max={36}
-              value={this.state.takeoverPeriod}
-              onChange={this.handleChange('takeoverPeriod')}
-              onSelect={this.handleSelection('takeoverPeriod')}
-            />
-          </List>
-        </Drawer>
-
-        <main className={cx(classes!.content, { [classes!.contentShift!]: this.state.drawerOpen })}>
+        <main className={styles.content}>
           <Card className={styles.card}>
             <CardContent>
               <Line
@@ -226,74 +112,28 @@ class App extends PureComponent<Props, State> {
                   datasets: [
                     {
                       label: 'Adoption Curve',
-                      fill: '+2',
                       lineTension: 0.1,
                       borderColor: 'rgba(255,0,0,1)',
                       data: d1,
                     },
-                    // {
-                    //   label: 'Normal',
-                    //   fill: false,
-                    //   lineTension: 0.1,
-                    //   borderColor: 'rgba(75,192,192,1)',
-                    //   data: d2,
-                    // },
-                    // {
-                    //   label: 'Best',
-                    //   fill: false,
-                    //   lineTension: 0.1,
-                    //   borderColor: 'rgba(0,255,0,1)',
-                    //   data: d3,
-                    // },
+                    {
+                      label: 'Return On Investment',
+                      lineTension: 0.1,
+                      borderColor: 'rgba(75,192,192,1)',
+                      data: d2,
+                    },
                   ],
                 }}
               />
             </CardContent>
           </Card>
         </main>
+
+        {/* Return On Investment Drawer */}
+        <ReturnOnInvestmentCard onChange={this.handleChange as any} {...this.state} />
       </div>
     );
   }
 }
 
-const drawerWidth = 400;
-
-export default withStyles((theme) => ({
-  appBar: {
-    transition: theme.transitions.create(['margin', 'width'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  appBarShift: {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth,
-    transition: theme.transitions.create(['margin', 'width'], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  drawer: {
-    width: drawerWidth,
-    flexShrink: 0,
-  },
-  drawerPaper: {
-    width: drawerWidth,
-  },
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing.unit * 3,
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    marginLeft: -drawerWidth,
-  },
-  contentShift: {
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginLeft: 0,
-  },
-}), { withTheme: true })(App);
+export default App;

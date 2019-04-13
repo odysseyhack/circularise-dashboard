@@ -5,7 +5,13 @@
   left: 0; 
   width: 100vw;
   height: 100vh;
+  padding: 10px 0;
+  box-sizing: border-box;
   background-color: rgba(0, 0, 0, 0.05);
+}
+
+.content {
+  flex-grow: 1;
 }
 
 .card {
@@ -14,23 +20,4 @@
   justify-content: center;
   align-items: stretch;
   height: 100%;
-}
-
-.drawer-header {
-  display: flex;
-  justify-content: flex-end;
-  padding: 8px;
-}
-
-.menu-button {
-  margin: 0 12px 0 20px !important;
-}
-
-.is-hidden {
-  display: none !important;
-}
-
-.label {
-  padding-top: 10px !important;
-  justify-content: center !important;
 }
