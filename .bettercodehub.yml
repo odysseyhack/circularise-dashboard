@@ -3,4 +3,4 @@ exclude:
 - .*/index\.ts
 - .*/serviceWorker\.ts
 
-component_depth: 6
+component_depth: 5
