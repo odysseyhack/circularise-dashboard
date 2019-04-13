@@ -1,10 +1,12 @@
 component_depth: 3
+languages:
+- typescript
 
 exclude:
-- /App/public/.*
+- /App/public/
 - /App/src/index.tsx
 - /App/src/serviceWorker.ts
-- /node_modules/.*
+- /node_modules/
 
 include:
-- App/src/.*
+- App/src/
