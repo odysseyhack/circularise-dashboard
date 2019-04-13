@@ -5,6 +5,8 @@ import React, { PureComponent } from 'react';
 import { Line } from 'react-chartjs-2';
 
 import styles from './styles/app.module.scss';
+import Sidebar from './components/Sidebar';
+import Topbar from './components/Topbar';
 
 type State = {
   x1: number;
@@ -29,13 +31,10 @@ class App extends PureComponent<{}, State> {
     };
   }
 
-  public render() {
-    const d1 = [...Array(12)].map((_, i) => Math.pow(i, 2));
-    const d2 = d1.map((v, i) => v + i * this.state.x2);
-    const d3 = d2.map((v, i) => v + i * this.state.x3);
-
+  private renderGraph(data1: number[], data2: number[], data3: number[]) {
     return (
-      <div className={styles.app}>
+      <div className={styles.projectContent}>
+
         <Card className={styles.card}>
           <CardContent>
             <Slider className={styles.slider} value={this.state.x1} onChange={this.handleChange('x1')} />
@@ -73,7 +72,7 @@ class App extends PureComponent<{}, State> {
                     pointHoverBorderWidth: 2,
                     pointRadius: 1,
                     pointHitRadius: 10,
-                    data: d1,
+                    data: data1,
                   },
                   {
                     label: 'Normal',
@@ -93,7 +92,7 @@ class App extends PureComponent<{}, State> {
                     pointHoverBorderWidth: 2,
                     pointRadius: 1,
                     pointHitRadius: 10,
-                    data: d2,
+                    data: data2,
                   },
                   {
                     label: 'Best',
@@ -113,13 +112,39 @@ class App extends PureComponent<{}, State> {
                     pointHoverBorderWidth: 2,
                     pointRadius: 1,
                     pointHitRadius: 10,
-                    data: d3,
+                    data: data3,
                   },
                 ],
               }}
             />
           </CardContent>
         </Card>
+      </div>
+    );
+  }
+
+  public render() {
+    const d1 = [...Array(12)].map((_, i) => Math.pow(i, 2));
+    const d2 = d1.map((v, i) => v + i * this.state.x2);
+    const d3 = d2.map((v, i) => v + i * this.state.x3);
+
+    return (
+      <div className={styles.app}>
+        <Sidebar />
+        <div className={styles.container}>
+          <Topbar />
+
+          <div className={styles.content}>
+
+            <a className={styles.fundTitle}>
+              ROI Projections
+            </a>
+
+            {this.renderGraph(d1, d2, d3)}
+
+          </div>
+        </div>
+
       </div>
     );
   }

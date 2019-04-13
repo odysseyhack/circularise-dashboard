@@ -1,20 +1,44 @@
 .app {
-  position: fixed;
-  top: 0;
-  left: 0; 
-  width: 100vw;
-  height: 100vh;
-  padding: 20px;
-  box-sizing: border-box;
-  background-color: rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    box-sizing: border-box;
+    background-color: rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: row;
+}
+
+.container, .content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: auto;
+}
+
+.container {}
+
+.content {
+    padding: 75px 128px;
+}
+
+.projectContent {
+    display: flex;
+    flex-direction: row;
 }
 
 .card {
-  margin: 10px 0;
+    margin: 10px 0;
 }
 
 .slider {
-  margin: 10px 0;
+    margin: 10px 0;
+}
+
+.fundTitle {
+    text-transform: uppercase;
+    font-size: 28px;
+    color: #464646;
+    margin-bottom: 28px;
 }
