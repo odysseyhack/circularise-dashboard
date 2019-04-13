@@ -11,3 +11,8 @@ languages:
     include:
       - .*\.tsx
       - .*\.ts
+    exclude:
+      - .*test\.tsx
+  test:
+    include:
+      - .*test\.tsx
