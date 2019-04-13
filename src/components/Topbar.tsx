@@ -2,12 +2,12 @@ import { Card, InputBase } from '@material-ui/core';
 import NotificationIcon from '@material-ui/icons/Notifications';
 import SearchIcon from '@material-ui/icons/Search';
 import cx from 'classnames';
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 
 import profilePhoto from '../assets/profile-photo-a.jpg';
 import styles from '../styles/topbar.module.scss';
 
-export default class Topbar extends Component {
+export class Topbar extends PureComponent {
     public render() {
         return (
             <Card className={styles.topbar}>

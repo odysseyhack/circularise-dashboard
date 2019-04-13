@@ -1,9 +1,9 @@
 import HomeIcon from '@material-ui/icons/HomeOutlined';
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 
 import styles from '../styles/sidebar.module.scss';
 
-export default class Sidebar extends Component {
+export class Sidebar extends PureComponent {
     public render() {
         return (
             <div className={styles.sidebar}>

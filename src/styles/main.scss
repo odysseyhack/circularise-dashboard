@@ -13,12 +13,22 @@ code {
     monospace;
 }
 
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+
 .rc-slider {
   &-track {
     background-color: red !important;
   }
 
   &-handle {
+    border-color: red !important;
+  }
+
+  &-dot-active {
     border-color: red !important;
   }
 }

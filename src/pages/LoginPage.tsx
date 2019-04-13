@@ -2,10 +2,15 @@ import { CardContent, TextField, Card, Tabs, Tab, Button, Select, OutlinedInput,
 import React, { PureComponent } from 'react';
 import { RouteComponentProps } from 'react-router';
 
-import { Roles } from '../enums/Roles';
 import styles from '../styles/login-page.module.scss';
 
 type Props = RouteComponentProps;
+
+export enum Roles {
+  BUIDLER = 'buidler',
+  INVESTOR = 'investor',
+  GOVERNOR = 'governor',
+}
 
 type State = {
   tabValue: TabValue;
@@ -80,7 +85,7 @@ export class LoginPage extends PureComponent<Props, State> {
 
       this.props.history.push('/home');
     } catch (e) {
-      console.log(`Failed registering: ${e}`);
+      // console.log(`Failed registering: ${e}`);
     }
   }
 
