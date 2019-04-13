@@ -4,6 +4,7 @@ import {
   ListItem,
   FormLabel,
 } from '@material-ui/core';
+import cx from 'classnames';
 import React, { PureComponent } from 'react';
 
 import styles from '../styles/drawers.module.scss';
@@ -40,7 +41,7 @@ export class ReturnOnInvestmentCard extends PureComponent<Props> {
     } = this.props;
 
     return (
-      <Card className={styles.card}>
+      <Card className={cx(styles.card, 'alternative-sliders')}>
         <List>
           <ListItem className={styles.label}>
             <FormLabel>Transaction Fee ({trFee})</FormLabel>
@@ -48,6 +49,8 @@ export class ReturnOnInvestmentCard extends PureComponent<Props> {
 
           <SliderParameter
             value={trFee}
+            max={2}
+            step={0.1}
             onChange={(val) => { onChange('trFee', val); }}
           />
 
@@ -57,6 +60,8 @@ export class ReturnOnInvestmentCard extends PureComponent<Props> {
 
           <SliderParameter
             value={trCosts}
+            max={trFee - 0.01}
+            step={0.01}
             onChange={(val) => { onChange('trCosts', val); }}
           />
 
@@ -66,6 +71,7 @@ export class ReturnOnInvestmentCard extends PureComponent<Props> {
 
           <SliderParameter
             value={multiplier}
+            min={1}
             onChange={(val) => { onChange('multiplier', val); }}
           />
 
@@ -95,7 +101,7 @@ export class ReturnOnInvestmentCard extends PureComponent<Props> {
           </ListItem>
 
           <SliderParameter
-            min={1}
+            min={10000}
             max={1000000}
             step={10000}
             value={investment}

@@ -1,6 +1,8 @@
 import {
   Card,
   CardContent,
+  MuiThemeProvider,
+  createMuiTheme,
 } from '@material-ui/core';
 import 'rc-slider/assets/index.css';
 import React, { PureComponent } from 'react';
@@ -35,12 +37,12 @@ class App extends PureComponent<Props, State> {
 
     this.state = {
       trCurrent: 10,
-      trMaxAdoption: 10000,
+      trMaxAdoption: 10000000,
       curviness: 500,
       startOfFastGrowth: 10,
       takeoverPeriod: 24,
-      trFee: 0.01,
-      trCosts: 0.1,
+      trFee: 0.1,
+      trCosts: 0.01,
       multiplier: 4,
       maxMultiplier: 10,
       multiplierDiscounter: 1,
@@ -55,14 +57,20 @@ class App extends PureComponent<Props, State> {
     this.setState({ [field]: val } as any);
   }
 
-  private adoptionCurve() {
+  private calcAdoption(t: number) {
     const { trCurrent, trMaxAdoption, curviness, startOfFastGrowth, takeoverPeriod } = this.state;
+
+    return trCurrent + (trMaxAdoption - trCurrent) / (1 + Math.pow(curviness, (startOfFastGrowth + takeoverPeriod / 2 - t) / takeoverPeriod));
+  }
+
+  private adoptionCurve() {
+    const { trMaxAdoption } = this.state;
     const curve: number[] = [];
 
     let t = 0;
     let res = 0;
     while (res < 0.999 * trMaxAdoption) {
-      res = trCurrent + (trMaxAdoption - trCurrent) / (1 + Math.pow(curviness, (startOfFastGrowth + takeoverPeriod / 2 - t) / takeoverPeriod));
+      res = this.calcAdoption(t);
       curve.push(res);
       t++;
     }
@@ -70,7 +78,7 @@ class App extends PureComponent<Props, State> {
     return curve;
   }
 
-  private returnOnInvestment(adoptionCurve: number[]) {
+  private returnOnInvestmentCurve() {
     const {
       trFee,
       trCosts,
@@ -83,19 +91,30 @@ class App extends PureComponent<Props, State> {
       returnReceived,
     } = this.state;
 
-    return adoptionCurve.map((ac, t) => {
+    let t = 0;
+    let endGoal = investment * multiplier - returnReceived;
+    const curve: number[] = [];
+
+    while (endGoal > 0) {
+      const ac = this.calcAdoption(t);
       const t1 = (maxMultiplier - multiplier) * multiplierDiscounter;
       const t2 = investment * investmentDiscounter;
       const t3 = t * maturityRate;
       const investmentWeight = t1 * t2 + t3;
 
-      return investmentWeight * (investment * multiplier - returnReceived) / (trFee * trCosts * ac);
-    });
+      const res = (trFee - trCosts) * ac;
+
+      endGoal -= res;
+      curve.push(res);
+      t++;
+    }
+
+    return curve;
   }
 
   public render() {
     const d1 = this.adoptionCurve();
-    const d2 = this.returnOnInvestment(d1);
+    const d2 = this.returnOnInvestmentCurve();
 
     return (
       <div className={styles.app}>
@@ -113,13 +132,22 @@ class App extends PureComponent<Props, State> {
                     {
                       label: 'Adoption Curve',
                       lineTension: 0.1,
-                      borderColor: 'rgba(255,0,0,1)',
+                      borderColor: '#D5914E',
                       data: d1,
                     },
+                  ],
+                }}
+              />
+
+              <Line
+                options={{ maintainAspectRatio: true }}
+                data={{
+                  labels: d2.map((_, i) => i),
+                  datasets: [
                     {
                       label: 'Return On Investment',
                       lineTension: 0.1,
-                      borderColor: 'rgba(75,192,192,1)',
+                      borderColor: '#4E97D5',
                       data: d2,
                     },
                   ],
@@ -136,4 +164,8 @@ class App extends PureComponent<Props, State> {
   }
 }
 
-export default App;
+export default () => (
+  <MuiThemeProvider theme={createMuiTheme({ palette: { primary: { main: 'rgba(0,0,0,0.2)' } } })}>
+    <App />
+  </MuiThemeProvider>
+);

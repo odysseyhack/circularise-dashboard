@@ -1,4 +1,4 @@
-import { ListItem, TextField } from '@material-ui/core';
+import { ListItem, TextField, Tooltip } from '@material-ui/core';
 import Slider from 'rc-slider';
 import React, { PureComponent } from 'react';
 
@@ -22,8 +22,8 @@ export class SliderParameter extends PureComponent<Props, State> {
     super(props);
 
     this.state = {
-      min: props.min !== undefined ? props.min : 0,
-      max: props.max !== undefined ? props.max : 10,
+      min: 0,
+      max: 10,
     };
   }
 
@@ -41,9 +41,21 @@ export class SliderParameter extends PureComponent<Props, State> {
     };
   }
 
+  public renderHandle(props: any) {
+    const { value, dragging, index, ...restProps } = props;
+    return (
+      <div>
+        <Slider.Handle value={value} {...restProps} />
+
+        <div className={styles.handle}>{value}</div>
+      </div>
+    );
+  }
+
   public render() {
     const { value, step, onChange } = this.props;
-    const { min, max } = this.state;
+    const min = this.props.min !== undefined ? this.props.min : this.state.min;
+    const max = this.props.max !== undefined ? this.props.max : this.state.max;
 
     return (
       <ListItem>
@@ -55,6 +67,7 @@ export class SliderParameter extends PureComponent<Props, State> {
           max={max}
           step={step}
           defaultValue={value}
+          handle={this.renderHandle}
           onAfterChange={onChange}
         />
 

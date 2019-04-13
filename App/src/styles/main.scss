@@ -21,14 +21,30 @@ input[type=number]::-webkit-outer-spin-button {
 
 .rc-slider {
   &-track {
-    background-color: red !important;
+    background-color: #D5914E !important;
   }
 
   &-handle {
-    border-color: red !important;
+    border-color: #D5914E !important;
   }
 
   &-dot-active {
-    border-color: red !important;
+    border-color: #D5914E !important;
+  }
+}
+
+.alternative-sliders {
+  .rc-slider {
+    &-track {
+      background-color: #4E97D5 !important;
+    }
+
+    &-handle {
+      border-color: #4E97D5 !important;
+    }
+
+    &-dot-active {
+      border-color: #4E97D5 !important;
+    }
   }
 }
