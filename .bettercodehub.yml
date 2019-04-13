@@ -1,8 +1,7 @@
 exclude:
 - /App/src/serviceWorker.ts
 
-
-- name: java
+- name: typescript
   production:
     include:
       - .*/.tsx
