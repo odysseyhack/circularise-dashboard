@@ -7,6 +7,8 @@ import styles from '../styles/slider-parameter.module.scss';
 type Props = {
   value: number;
   checked: boolean;
+  min?: number;
+  max?: number;
   onChange: (val: number) => void;
   onSelect: () => void;
 };
@@ -21,8 +23,8 @@ export class SliderParameter extends PureComponent<Props, State> {
     super(props);
 
     this.state = {
-      min: 0,
-      max: 10,
+      min: props.min !== undefined ? props.min : 0,
+      max: props.max !== undefined ? props.max : 10,
     };
   }
 
@@ -50,7 +52,7 @@ export class SliderParameter extends PureComponent<Props, State> {
 
         <TextField type="number" variant="outlined" value={min} onChange={this.handleMinMax('min')} />
 
-        <Slider className={styles.slider} min={min} max={max} value={value} onChange={onChange} />
+        <Slider className={styles.slider} min={min} max={max} defaultValue={value} onAfterChange={onChange} />
 
         <TextField type="number" variant="outlined" value={max} onChange={this.handleMinMax('max')} />
       </ListItem>

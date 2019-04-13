@@ -11,6 +11,8 @@ import {
   AppBar,
   Toolbar,
   Typography,
+  ListItem,
+  FormLabel,
 } from '@material-ui/core';
 import {
   Menu as MenuIcon,
@@ -33,7 +35,11 @@ type Props = StyledComponentProps & WithTheme;
 type State = {
   drawerOpen: boolean;
   selectedParameter: keyof State;
-  x1: number;
+  trCurrent: number;
+  trMaxAdoption: number;
+  curviness: number;
+  startOfFastGrowth: number;
+  takeoverPeriod: number;
   x2: string;
   x3: number;
   x4: number;
@@ -45,8 +51,12 @@ class App extends PureComponent<Props, State> {
 
     this.state = {
       drawerOpen: true,
-      selectedParameter: 'x1',
-      x1: 0,
+      selectedParameter: 'trCurrent',
+      trCurrent: 10,
+      trMaxAdoption: 10000,
+      curviness: 500,
+      startOfFastGrowth: 10,
+      takeoverPeriod: 24,
       x2: 'year',
       x3: 5,
       x4: 8,
@@ -71,11 +81,27 @@ class App extends PureComponent<Props, State> {
     };
   }
 
+  private adoptionCurve() {
+    const { trCurrent, trMaxAdoption, curviness, startOfFastGrowth, takeoverPeriod } = this.state;
+    const curve: number[] = [];
+
+    let t = 0;
+    let res = 0;
+    while (res < 0.999 * trMaxAdoption) {
+      res = trCurrent + (trMaxAdoption - trCurrent) / (1 + Math.pow(curviness, (startOfFastGrowth + takeoverPeriod / 2 - t) / takeoverPeriod));
+      curve.push(res);
+      t++;
+    }
+
+    return curve;
+  }
+
   public render() {
     const { classes, theme } = this.props;
 
-    const d1 = [...Array(12)].map((_, i) => Math.pow(i, 2));
-    const d2 = d1.map((v, i) => v + i * this.state.x1);
+    const d1 = this.adoptionCurve();
+    // const d1 = [...Array(12)].map((_, i) => Math.pow(i, 2));
+    const d2 = d1.map((v, i) => v + i * this.state.trCurrent);
     const d3 = d2.map((v, i) => v + i * this.state.x3);
 
     return (
@@ -119,33 +145,73 @@ class App extends PureComponent<Props, State> {
           <Divider />
 
           <List>
-            <SliderParameter
-              checked={this.state.selectedParameter === 'x1'}
-              value={this.state.x1}
-              onChange={this.handleChange('x1')}
-              onSelect={this.handleSelection('x1')}
-            />
-
-            <SelectParameter
-              checked={this.state.selectedParameter === 'x2'}
-              values={['year', 'month', 'week']}
-              value={this.state.x2}
-              onChange={this.handleChange('x2')}
-              onSelect={this.handleSelection('x2')}
-            />
+            <ListItem className={styles.label}>
+              <FormLabel>Current Transactions/month</FormLabel>
+            </ListItem>
 
             <InputParamater
-              checked={this.state.selectedParameter === 'x3'}
-              value={this.state.x3}
-              onChange={this.handleChange('x3')}
-              onSelect={this.handleSelection('x3')}
+              checked={this.state.selectedParameter === 'trCurrent'}
+              value={this.state.trCurrent}
+              onChange={this.handleChange('trCurrent')}
+              onSelect={this.handleSelection('trCurrent')}
             />
 
-            <StepParameter
-              checked={this.state.selectedParameter === 'x4'}
-              value={this.state.x4}
-              onChange={this.handleChange('x4')}
-              onSelect={this.handleSelection('x4')}
+            <Divider />
+
+            <ListItem className={styles.label}>
+              <FormLabel>Max Transactions/month</FormLabel>
+            </ListItem>
+
+            <InputParamater
+              checked={this.state.selectedParameter === 'trMaxAdoption'}
+              value={this.state.trMaxAdoption}
+              onChange={this.handleChange('trMaxAdoption')}
+              onSelect={this.handleSelection('trMaxAdoption')}
+            />
+
+            <Divider />
+
+            <ListItem className={styles.label}>
+              <FormLabel>Adoption curve</FormLabel>
+            </ListItem>
+
+            <SliderParameter
+              checked={this.state.selectedParameter === 'curviness'}
+              min={1}
+              max={3000}
+              value={this.state.curviness}
+              onChange={this.handleChange('curviness')}
+              onSelect={this.handleSelection('curviness')}
+            />
+
+            <Divider />
+
+            <ListItem className={styles.label}>
+              <FormLabel>Start Month Of Fast Growth</FormLabel>
+            </ListItem>
+
+            <SliderParameter
+              checked={this.state.selectedParameter === 'startOfFastGrowth'}
+              min={1}
+              max={36}
+              value={this.state.startOfFastGrowth}
+              onChange={this.handleChange('startOfFastGrowth')}
+              onSelect={this.handleSelection('startOfFastGrowth')}
+            />
+
+            <Divider />
+
+            <ListItem className={styles.label}>
+              <FormLabel>Takeover Period</FormLabel>
+            </ListItem>
+
+            <SliderParameter
+              checked={this.state.selectedParameter === 'takeoverPeriod'}
+              min={1}
+              max={36}
+              value={this.state.takeoverPeriod}
+              onChange={this.handleChange('takeoverPeriod')}
+              onSelect={this.handleSelection('takeoverPeriod')}
             />
           </List>
         </Drawer>
@@ -156,30 +222,29 @@ class App extends PureComponent<Props, State> {
               <Line
                 options={{ maintainAspectRatio: true }}
                 data={{
-                  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'December'],
+                  labels: d1.map((_, i) => i),
                   datasets: [
                     {
-                      label: 'Worst',
+                      label: 'Adoption Curve',
                       fill: '+2',
                       lineTension: 0.1,
-                      backgroundColor: 'rgba(0,0,0,0.2)',
                       borderColor: 'rgba(255,0,0,1)',
                       data: d1,
                     },
-                    {
-                      label: 'Normal',
-                      fill: false,
-                      lineTension: 0.1,
-                      borderColor: 'rgba(75,192,192,1)',
-                      data: d2,
-                    },
-                    {
-                      label: 'Best',
-                      fill: false,
-                      lineTension: 0.1,
-                      borderColor: 'rgba(0,255,0,1)',
-                      data: d3,
-                    },
+                    // {
+                    //   label: 'Normal',
+                    //   fill: false,
+                    //   lineTension: 0.1,
+                    //   borderColor: 'rgba(75,192,192,1)',
+                    //   data: d2,
+                    // },
+                    // {
+                    //   label: 'Best',
+                    //   fill: false,
+                    //   lineTension: 0.1,
+                    //   borderColor: 'rgba(0,255,0,1)',
+                    //   data: d3,
+                    // },
                   ],
                 }}
               />
