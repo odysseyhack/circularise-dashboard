@@ -1,0 +1,6 @@
+exclude:
+- /public/.*
+- .*/index\.ts
+- .*/serviceWorker\.ts
+
+component_depth: 6
