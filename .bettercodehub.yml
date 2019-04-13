@@ -1,3 +1,2 @@
-
- languages:
- - typescript
+exclude:
+- /App/src/serviceWorker.ts
