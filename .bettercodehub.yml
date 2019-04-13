@@ -1,6 +1,7 @@
 exclude:
 - /App/src/serviceWorker.ts
 
+languages:
 - name: typescript
   production:
     include:
