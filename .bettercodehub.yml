@@ -1,4 +1,10 @@
+component_depth: 3
+
 exclude:
 - /App/public/.*
-- /App/src/index.ts
+- /App/src/index.tsx
 - /App/src/serviceWorker.ts
+- /node_modules/.*
+
+include:
+- App/src/.*
