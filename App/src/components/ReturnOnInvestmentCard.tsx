@@ -80,42 +80,23 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
         <List>
           {this.renderTitle('Transaction Parameters')}
           {this.renderLabel('Transaction Costs')}
-
           <SliderParameter value={trCosts} max={trFee - 0.001} step={0.001} onChange={(val) => { onChange('trCosts', val); }} />
-
           {this.renderLabel('Transaction Fee')}
-
           <SliderParameter value={trFee} min={trCosts} max={2} step={0.001} onChange={(val) => { onChange('trFee', val); }} />
-
           <Divider />
           {this.renderTitle('Protocol Parameters')}
-          <ListItem style={{ paddingBottom: 0, justifyContent: 'center' }}>
-            <FormLabel>Weight based on</FormLabel>
-          </ListItem>
-
-          <ListItem className={styles.label} style={{ justifyContent: 'space-between' }}>
-            <FormLabel>Investment</FormLabel>
-            <FormLabel>Multiplier</FormLabel>
-          </ListItem>
-
+          <ListItem style={{ paddingBottom: 0, justifyContent: 'center' }}><FormLabel>Weight based on</FormLabel></ListItem>
+          <ListItem className={styles.label} style={{ justifyContent: 'space-between' }}><FormLabel>Investment</FormLabel><FormLabel>Multiplier</FormLabel></ListItem>
           <StepParameter step={0.1} value={discounter} onChange={(val) => { onChange('discounter', val); }} />
-
           {this.renderLabel('Maturity Rate per month')}
-
-
           <InputParamater value={maturityRate} onChange={(val) => { onChange('maturityRate', val); }} />
-
           {this.renderLabel('Max Multiplier')};
-
           <InputParamater value={maxMultiplier} onChange={(val) => { onChange('maxMultiplier', val); }} />
-
           <Divider />
           {this.renderTitle('Investors')}
-
           <Tabs variant="fullWidth" value={this.state.selectedInvestor} onChange={(_, val) => { this.setState({ selectedInvestor: val }); }}>
             {investors.map((_, i) => (<Tab key={i} label={`Investor ${i + 1}`} />))}
           </Tabs>
-
           {investors.map((investor, i) => (
             this.state.selectedInvestor === i && <div key={i}>
               {this.renderLabel('Starting Month')}

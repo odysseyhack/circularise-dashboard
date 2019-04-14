@@ -115,7 +115,7 @@ class App extends PureComponent<Props, State> {
         .filter((investor, i) => endGoals[i] > 0 && month >= investor.startingMonth + 1)
         .reduce((prev, curr) => {
           const t1 = (maxMultiplier - curr.multiplier) * multiplierDiscounter;
-          const t2 = (curr.investment / 1) * investmentDiscounter;
+          const t2 = curr.investment * investmentDiscounter;
           const t3 = month * maturityRate;
           const investmentWeight = t1 * t2 + t3;
           console.log('consts', t1, t2, t3);
@@ -131,7 +131,7 @@ class App extends PureComponent<Props, State> {
 
         const ac = this.calcAdoption(month);
         const t1 = (maxMultiplier - investor.multiplier) * multiplierDiscounter;
-        const t2 = (investor.investment / 1) * investmentDiscounter;
+        const t2 = investor.investment * investmentDiscounter;
         const t3 = month * maturityRate;
         const investmentWeight = t1 * t2 + t3;
         const weightShare = investmentWeight / allWeights;
@@ -146,35 +146,29 @@ class App extends PureComponent<Props, State> {
     return investorCurves;
   }
 
-  public render() {
+  private renderGraph() {
     const d1 = this.adoptionCurve();
     const d2 = this.returnOnInvestmentCurve();
     const d3 = this.investorsCurve(d2.length);
 
     return (
+      <main className={styles.content}>
+        <Card className={styles.card}>
+          <CardContent>
+            <Line options={{ maintainAspectRatio: true }} data={{ labels: d1.map((_, i) => i), datasets: [{ label: 'Adoption Curve', lineTension: 0.1, borderColor: '#D5914E', data: d1, },], }} />
+            <Line options={{ maintainAspectRatio: true }} data={{ labels: d2.map((_, i) => i), datasets: [{ label: 'Return On Investment', lineTension: 0.1, borderColor: '#4E97D5', backgroundColor: 'rgba(0,0,0,0)', data: d2, }, ...d3.map((d, index) => ({ label: `Investor ${index + 1}`, lineTension: 0.1, borderColor: `#9${index * 9}F`, backgroundColor: 'rgba(0,0,0,0)', data: d, })),], }} />
+          </CardContent>
+        </Card>
+      </main>
+    );
+  }
+
+  public render() {
+    return (
       <div className={styles.app}>
         {/* Adoption Curve Drawer */}
         <AdoptionCurveCard onChange={this.handleChange as any} {...this.state} />
-
-        <main className={styles.content}>
-          <Card className={styles.card}>
-            <CardContent>
-              <Line options={{ maintainAspectRatio: true }}
-                data={{
-                  labels: d1.map((_, i) => i), datasets: [{ label: 'Adoption Curve', lineTension: 0.1, borderColor: '#D5914E', data: d1, },],
-                }}
-              />
-
-              <Line options={{ maintainAspectRatio: true }}
-                data={{
-                  labels: d2.map((_, i) => i), datasets: [{ label: 'Return On Investment', lineTension: 0.1, borderColor: '#4E97D5', backgroundColor: 'rgba(0,0,0,0)', data: d2, },
-                  ...d3.map((d, index) => ({ label: `Investor ${index + 1}`, lineTension: 0.1, borderColor: `#9${index * 9}F`, backgroundColor: 'rgba(0,0,0,0)', data: d, })),],
-                }}
-              />
-            </CardContent>
-          </Card>
-        </main>
-
+        {this.renderGraph()}
         {/* Return On Investment Drawer */}
         <ReturnOnInvestmentCard onChange={this.handleChange as any} onInvestorChange={this.handleInvestorChange as any} {...this.state} />
       </div>
