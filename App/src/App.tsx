@@ -214,6 +214,7 @@ class App extends PureComponent<Props, State> {
         <AdoptionCurveCard
           onChange={this.handleChange as any}
           {...this.state} />
+
         {this.renderGraph()}
 
         {/* Return On Investment Drawer */}

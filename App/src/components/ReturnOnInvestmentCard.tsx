@@ -7,6 +7,7 @@ import {
   Divider,
   Tab,
   Tabs,
+  Button,
 } from '@material-ui/core';
 import cx from 'classnames';
 import React, { PureComponent } from 'react';
@@ -61,6 +62,20 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
         <Typography>{text}</Typography>
       </ListItem>
     );
+  }
+
+  private handleSubmit = async () => {
+    await fetch('http://localhost:9000/transaction', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        command: 'transaction',
+      }),
+    });
+
   }
 
   public render() {
@@ -128,7 +143,7 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
             onChange={(val) => { onChange('maturityRate', val); }}
           />
 
-          {this.renderLabel('Max Multiplier')};
+          {this.renderLabel('Max Multiplier')}
           <InputParamater
             value={maxMultiplier}
             onChange={(val) => { onChange('maxMultiplier', val); }}
@@ -177,6 +192,15 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
                 max={maxMultiplier}
                 onChange={(val) => { onInvestorChange(i, 'multiplier', val); }}
               />
+
+              <Button
+                variant="contained"
+                color="secondary"
+                className={styles.button}
+                onClick={this.handleSubmit}
+              >
+                Submit Investment
+              </Button>
             </div>
           ))}
         </List>
