@@ -16,7 +16,13 @@ export class StepParameter extends PureComponent<Props> {
 
     return (
       <ListItem>
-        <Slider max={1} step={step} value={value} onChange={onChange} marks={{ 0.5: '0' }} />
+        <Slider
+          max={1}
+          step={step}
+          value={value}
+          onChange={onChange}
+          marks={{ 0.5: '0' }}
+        />
       </ListItem>
     );
   }

@@ -15,7 +15,6 @@ import styles from '../styles/drawers.module.scss';
 
 import { InputParamater } from './InputParamter';
 import { SliderParameter } from './SliderParameter';
-import { StepParameter } from './StepParameter';
 
 type Investor = {
   investment: number;
@@ -80,46 +79,104 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
     return (
       <Card className={cx(styles.card, 'alternative-sliders')}>
         <List>
+          {/* Transaction Parameters */}
           {this.renderTitle('Transaction Parameters')}
+
           {this.renderLabel('Transaction Costs')}
-          <SliderParameter value={trCosts} max={trFee - 0.001} step={0.001} onChange={(val) => { onChange('trCosts', val); }} />
+          <SliderParameter
+            value={trCosts}
+            max={trFee - 0.001}
+            step={0.001}
+            onChange={(val) => { onChange('trCosts', val); }}
+          />
+
           {this.renderLabel('Transaction Fee')}
-          <SliderParameter value={trFee} min={trCosts} max={2} step={0.001} onChange={(val) => { onChange('trFee', val); }} />
+          <SliderParameter
+            value={trFee}
+            min={trCosts}
+            max={2}
+            step={0.001}
+            onChange={(val) => { onChange('trFee', val); }}
+          />
+
           <Divider />
 
+          {/* Protocol Parameters */}
           {this.renderTitle('Protocol Parameters')}
-          {/* <ListItem style={{ paddingBottom: 0, justifyContent: 'center' }}><FormLabel>Weight based on</FormLabel></ListItem> */}
-          {/* <ListItem className={styles.label} style={{ justifyContent: 'space-between' }}><FormLabel>Investment</FormLabel><FormLabel>Multiplier</FormLabel></ListItem> */}
-          {/* <StepParameter step={0.1} value={discounter} onChange={(val) => { onChange('discounter', val); }} /> */}
 
           {this.renderLabel('Weight based on Investment')}
-          <SliderParameter value={investmentDiscounter} max={10} min={0.001} step={0.001} onChange={(val) => { onChange('investmentDiscounter', val); }} />
+          <SliderParameter
+            value={investmentDiscounter}
+            min={0.001}
+            max={10}
+            step={0.001}
+            onChange={(val) => { onChange('investmentDiscounter', val); }}
+          />
+
           {this.renderLabel('Weight based on Multiplier')}
-          <SliderParameter value={multiplierDiscounter} max={50000} min={0.001} step={0.001} onChange={(val) => { onChange('multiplierDiscounter', val); }} />
+          <SliderParameter
+            value={multiplierDiscounter}
+            min={0.001}
+            max={50000}
+            step={0.001}
+            onChange={(val) => { onChange('multiplierDiscounter', val); }}
+          />
 
           {this.renderLabel('Maturity Rate per month')}
-          <InputParamater value={maturityRate} onChange={(val) => { onChange('maturityRate', val); }} />
+          <InputParamater
+            value={maturityRate}
+            onChange={(val) => { onChange('maturityRate', val); }}
+          />
+
           {this.renderLabel('Max Multiplier')};
-          <InputParamater value={maxMultiplier} onChange={(val) => { onChange('maxMultiplier', val); }} />
+          <InputParamater
+            value={maxMultiplier}
+            onChange={(val) => { onChange('maxMultiplier', val); }}
+          />
+
           <Divider />
 
+
+          {/* Investors */}
           {this.renderTitle('Investors')}
-          <Tabs variant="fullWidth" value={this.state.selectedInvestor} onChange={(_, val) => { this.setState({ selectedInvestor: val }); }}>
-            {investors.map((_, i) => (<Tab key={i} label={`Investor ${i + 1}`} />))}
+          <Tabs
+            variant="fullWidth"
+            value={this.state.selectedInvestor}
+            onChange={(_, val) => {
+              this.setState({ selectedInvestor: val });
+            }}
+          >
+            {investors.map((_, i) => (
+              <Tab key={i} label={`Investor ${i + 1}`} />
+            ))}
           </Tabs>
+
           {investors.map((investor, i) => (
             this.state.selectedInvestor === i && <div key={i}>
-              {this.renderLabel('Starting Month')}
 
-              <InputParamater value={investor.startingMonth} onChange={(val) => { onInvestorChange(i, 'startingMonth', val); }} />
+              {this.renderLabel('Starting Month')}
+              <InputParamater
+                value={investor.startingMonth}
+                onChange={(val) => { onInvestorChange(i, 'startingMonth', val); }}
+              />
 
               {this.renderLabel('Investment')}
-
-              <SliderParameter min={10000} max={1000000} step={10000} value={investor.investment} onChange={(val) => { onInvestorChange(i, 'investment', val); }} />
+              <SliderParameter
+                min={10000}
+                max={1000000}
+                step={10000}
+                value={investor.investment}
+                onChange={(val) => { onInvestorChange(i, 'investment', val); }}
+              />
 
               {this.renderLabel('Multiplier')}
 
-              <SliderParameter value={investor.multiplier} min={1} max={maxMultiplier} onChange={(val) => { onInvestorChange(i, 'multiplier', val); }} />
+              <SliderParameter
+                value={investor.multiplier}
+                min={1}
+                max={maxMultiplier}
+                onChange={(val) => { onInvestorChange(i, 'multiplier', val); }}
+              />
             </div>
           ))}
         </List>

@@ -50,7 +50,17 @@ class App extends PureComponent<Props, State> {
     super(props);
 
     this.state = {
-      trCurrent: 10, trMaxAdoption: 10000000, curviness: 500, startOfFastGrowth: 10, takeoverPeriod: 24, trCosts: 0.1, trFee: 0.15, maxMultiplier: 10, maturityRate: 5000, multiplierDiscounter: 0.001, investmentDiscounter: 0.001,
+      trCurrent: 10,
+      trMaxAdoption: 10000000,
+      curviness: 500,
+      startOfFastGrowth: 10,
+      takeoverPeriod: 24,
+      trCosts: 0.1,
+      trFee: 0.15,
+      maxMultiplier: 10,
+      maturityRate: 5000,
+      multiplierDiscounter: 0.001,
+      investmentDiscounter: 0.001,
       investors: [
         { investment: 500000, multiplier: 2, startingMonth: 0, returnReceived: 0, },
         { investment: 500000, multiplier: 8, startingMonth: 0, returnReceived: 0, },
@@ -76,7 +86,8 @@ class App extends PureComponent<Props, State> {
   private calcAdoption(t: number) {
     const { trCurrent, trMaxAdoption, curviness, startOfFastGrowth, takeoverPeriod } = this.state;
 
-    return trCurrent + (trMaxAdoption - trCurrent) / (1 + Math.pow(curviness, (startOfFastGrowth + takeoverPeriod / 2 - t) / takeoverPeriod));
+    return trCurrent + (trMaxAdoption - trCurrent) /
+      (1 + Math.pow(curviness, (startOfFastGrowth + takeoverPeriod / 2 - t) / takeoverPeriod));
   }
 
   private adoptionCurve() {
@@ -85,6 +96,7 @@ class App extends PureComponent<Props, State> {
 
     let t = 0;
     let res = 0;
+
     while (res < 0.999 * trMaxAdoption) {
       res = this.calcAdoption(t);
       curve.push(res);
@@ -163,8 +175,32 @@ class App extends PureComponent<Props, State> {
       <main className={styles.content}>
         <Card className={styles.card}>
           <CardContent>
-            <Line options={{ maintainAspectRatio: true }} data={{ labels: d1.map((_, i) => i), datasets: [{ label: 'Adoption Curve', lineTension: 0.1, borderColor: '#D5914E', data: d1, },], }} />
-            <Line options={{ maintainAspectRatio: true }} data={{ labels: d2.map((_, i) => i), datasets: [{ label: 'Return On Investment', lineTension: 0.1, borderColor: '#4E97D5', backgroundColor: 'rgba(0,0,0,0)', data: d2, }, ...d3.map((d, index) => ({ label: `Investor ${index + 1}`, lineTension: 0.1, borderColor: `#9${index * 9}F`, backgroundColor: 'rgba(0,0,0,0)', data: d, })),], }} />
+            <Line
+              options={{ maintainAspectRatio: true }}
+              data={{
+                labels: d1.map((_, i) => i),
+                datasets: [
+                  { label: 'Adoption Curve', lineTension: 0.1, borderColor: '#D5914E', data: d1, },
+                ],
+              }}
+            />
+
+            <Line
+              options={{ maintainAspectRatio: true }}
+              data={{
+                labels: d2.map((_, i) => i),
+                datasets: [
+                  {
+                    label: 'Return On Investment', lineTension: 0.1, borderColor: '#4E97D5', backgroundColor: 'rgba(0,0,0,0)', data: d2,
+                  },
+                  ...d3.map((d, index) => ({
+                    label: `Investor ${index + 1}`,
+                    lineTension: 0.1,
+                    borderColor: `#9${index * 9}F`,
+                    backgroundColor: 'rgba(0,0,0,0)',
+                    data: d,
+                  })),],
+              }} />
           </CardContent>
         </Card>
       </main>
@@ -175,10 +211,16 @@ class App extends PureComponent<Props, State> {
     return (
       <div className={styles.app}>
         {/* Adoption Curve Drawer */}
-        <AdoptionCurveCard onChange={this.handleChange as any} {...this.state} />
+        <AdoptionCurveCard
+          onChange={this.handleChange as any}
+          {...this.state} />
         {this.renderGraph()}
+
         {/* Return On Investment Drawer */}
-        <ReturnOnInvestmentCard onChange={this.handleChange as any} onInvestorChange={this.handleInvestorChange as any} {...this.state} />
+        <ReturnOnInvestmentCard
+          onChange={this.handleChange as any}
+          onInvestorChange={this.handleInvestorChange as any}
+          {...this.state} />
       </div>
     );
   }

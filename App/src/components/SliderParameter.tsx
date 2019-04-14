@@ -1,4 +1,4 @@
-import { ListItem, TextField, Tooltip } from '@material-ui/core';
+import { ListItem, TextField } from '@material-ui/core';
 import Slider from 'rc-slider';
 import React, { PureComponent } from 'react';
 
@@ -31,7 +31,7 @@ export class SliderParameter extends PureComponent<Props, State> {
   }
 
   public renderHandle(props: any) {
-    const { value, dragging, index, ...restProps } = props;
+    const { value, ...restProps } = props;
     return (
       <div>
         <Slider.Handle value={value} {...restProps} />
@@ -51,11 +51,29 @@ export class SliderParameter extends PureComponent<Props, State> {
 
     return (
       <ListItem>
-        <TextField type="number" variant="outlined" value={min} onChange={this.handleMinMax('min')} />
+        <TextField
+          type="number"
+          variant="outlined"
+          value={min}
+          onChange={this.handleMinMax('min')}
+        />
 
-        <Slider className={styles.slider} min={min} max={max} step={step} defaultValue={value} handle={this.renderHandle} onAfterChange={onChange} />
+        <Slider
+          className={styles.slider}
+          min={min}
+          max={max}
+          step={step}
+          defaultValue={value}
+          handle={this.renderHandle}
+          onAfterChange={onChange}
+        />
 
-        <TextField type="number" variant="outlined" value={max} onChange={this.handleMinMax('max')} />
+        <TextField
+          type="number"
+          variant="outlined"
+          value={max}
+          onChange={this.handleMinMax('max')}
+        />
       </ListItem>
     );
   }

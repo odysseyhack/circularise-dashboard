@@ -16,7 +16,11 @@ export class InputParamater extends PureComponent<Props> {
 
     return (
       <ListItem>
-        <TextField type="number" variant="outlined" value={value} onChange={this.handleChange} />
+        <TextField
+          type="number"
+          variant="outlined"
+          value={value} onChange={this.handleChange}
+        />
       </ListItem>
     );
   }

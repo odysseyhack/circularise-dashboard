@@ -18,9 +18,16 @@ export class SelectParameter extends PureComponent<Props> {
 
     return (
       <ListItem>
-        <ListItemIcon><Radio checked={checked} onChange={onSelect} /></ListItemIcon>
+        <ListItemIcon>
+          <Radio checked={checked} onChange={onSelect} />
+        </ListItemIcon>
 
-        <ToggleButtonGroup className={styles['button-group']} exclusive value={value} onChange={(_, v) => { onChange(v); }}>
+        <ToggleButtonGroup
+          className={styles['button-group']}
+          exclusive
+          value={value}
+          onChange={(_, v) => { onChange(v); }}
+        >
           {values.map((v) => (<ToggleButton key={v} value={v}> {v} </ToggleButton>))}
         </ToggleButtonGroup>
       </ListItem>

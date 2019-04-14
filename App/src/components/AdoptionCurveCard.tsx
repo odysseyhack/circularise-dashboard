@@ -27,17 +27,52 @@ export class AdoptionCurveCard extends PureComponent<Props> {
     return (
       <List>
         <ListItem><Typography>Adoption Curve</Typography></ListItem>
-        <ListItem className={styles.label}><FormLabel>Current Transactions/month</FormLabel></ListItem>
-        <InputParamater value={this.props.trCurrent} onChange={(val) => { this.props.onChange('trCurrent', val); }} />
-        <ListItem className={styles.label}><FormLabel>Max Transactions/month</FormLabel></ListItem>
-        <InputParamater value={this.props.trMaxAdoption} onChange={(val) => { this.props.onChange('trMaxAdoption', val); }} />
+
+        <ListItem className={styles.label}>
+          <FormLabel>Current Transactions/month</FormLabel>
+        </ListItem>
+        <InputParamater
+          value={this.props.trCurrent}
+          onChange={(val) => { this.props.onChange('trCurrent', val); }}
+        />
+
+        <ListItem className={styles.label}>
+          <FormLabel>Max Transactions/month</FormLabel>
+        </ListItem>
+        <InputParamater
+          value={this.props.trMaxAdoption}
+          onChange={(val) => { this.props.onChange('trMaxAdoption', val); }}
+        />
+
         <ListItem className={styles.label}><FormLabel>Curviness</FormLabel></ListItem>
-        <SliderParameter min={10} max={3000} value={this.props.curviness} onChange={(val) => { this.props.onChange('curviness', val); }} />
-        <ListItem className={styles.label}><FormLabel>Start Month Of Fast Growth</FormLabel></ListItem>
-        <SliderParameter min={1} max={36} value={this.props.startOfFastGrowth} onChange={(val) => { this.props.onChange('startOfFastGrowth', val); }} />
-        <ListItem className={styles.label}><FormLabel>Takeover Period</FormLabel></ListItem>
-        <SliderParameter min={1} max={60} value={this.props.takeoverPeriod} onChange={(val) => { this.props.onChange('takeoverPeriod', val); }} />
-      </List>);
+        <SliderParameter
+          min={10}
+          max={3000}
+          value={this.props.curviness}
+          onChange={(val) => { this.props.onChange('curviness', val); }}
+        />
+
+        <ListItem className={styles.label}>
+          <FormLabel>Start Month Of Fast Growth</FormLabel>
+        </ListItem>
+        <SliderParameter
+          min={1}
+          max={36}
+          value={this.props.startOfFastGrowth}
+          onChange={(val) => { this.props.onChange('startOfFastGrowth', val); }}
+        />
+
+        <ListItem className={styles.label}>
+          <FormLabel>Takeover Period</FormLabel>
+        </ListItem>
+        <SliderParameter
+          min={1}
+          max={60}
+          value={this.props.takeoverPeriod}
+          onChange={(val) => { this.props.onChange('takeoverPeriod', val); }}
+        />
+      </List>
+    );
   }
 
   public render() {
