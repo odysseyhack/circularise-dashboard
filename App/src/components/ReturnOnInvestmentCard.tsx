@@ -28,7 +28,8 @@ type Props = {
   trFee: number;
   trCosts: number;
   maxMultiplier: number;
-  discounter: number;
+  multiplierDiscounter: number;
+  investmentDiscounter: number;
   maturityRate: number;
   investors: Investor[]
   onChange: (field: keyof Props, val: any) => void;
@@ -68,7 +69,8 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
       trFee,
       trCosts,
       maxMultiplier,
-      discounter,
+      multiplierDiscounter,
+      investmentDiscounter,
       maturityRate,
       investors,
       onChange,
@@ -84,15 +86,23 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
           {this.renderLabel('Transaction Fee')}
           <SliderParameter value={trFee} min={trCosts} max={2} step={0.001} onChange={(val) => { onChange('trFee', val); }} />
           <Divider />
+
           {this.renderTitle('Protocol Parameters')}
-          <ListItem style={{ paddingBottom: 0, justifyContent: 'center' }}><FormLabel>Weight based on</FormLabel></ListItem>
-          <ListItem className={styles.label} style={{ justifyContent: 'space-between' }}><FormLabel>Investment</FormLabel><FormLabel>Multiplier</FormLabel></ListItem>
-          <StepParameter step={0.1} value={discounter} onChange={(val) => { onChange('discounter', val); }} />
+          {/* <ListItem style={{ paddingBottom: 0, justifyContent: 'center' }}><FormLabel>Weight based on</FormLabel></ListItem> */}
+          {/* <ListItem className={styles.label} style={{ justifyContent: 'space-between' }}><FormLabel>Investment</FormLabel><FormLabel>Multiplier</FormLabel></ListItem> */}
+          {/* <StepParameter step={0.1} value={discounter} onChange={(val) => { onChange('discounter', val); }} /> */}
+
+          {this.renderLabel('Weight based on Investment')}
+          <SliderParameter value={investmentDiscounter} max={10} min={0.001} step={0.001} onChange={(val) => { onChange('investmentDiscounter', val); }} />
+          {this.renderLabel('Weight based on Multiplier')}
+          <SliderParameter value={multiplierDiscounter} max={50000} min={0.001} step={0.001} onChange={(val) => { onChange('multiplierDiscounter', val); }} />
+
           {this.renderLabel('Maturity Rate per month')}
           <InputParamater value={maturityRate} onChange={(val) => { onChange('maturityRate', val); }} />
           {this.renderLabel('Max Multiplier')};
           <InputParamater value={maxMultiplier} onChange={(val) => { onChange('maxMultiplier', val); }} />
           <Divider />
+
           {this.renderTitle('Investors')}
           <Tabs variant="fullWidth" value={this.state.selectedInvestor} onChange={(_, val) => { this.setState({ selectedInvestor: val }); }}>
             {investors.map((_, i) => (<Tab key={i} label={`Investor ${i + 1}`} />))}

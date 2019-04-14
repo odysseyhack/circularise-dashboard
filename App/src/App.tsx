@@ -11,8 +11,19 @@ import { Line } from 'react-chartjs-2';
 import { AdoptionCurveCard } from './components/AdoptionCurveCard';
 import { ReturnOnInvestmentCard } from './components/ReturnOnInvestmentCard';
 import styles from './styles/app.module.scss';
+import { number } from 'prop-types';
 
 type Props = {};
+
+interface InvestmentParams {
+  maxMultiplier: number;
+  multiplier: number;
+  multiplierDiscounter: number;
+  investment: number;
+  investmentDiscounter: number;
+  month: number;
+  maturityRate: number;
+};
 
 type State = {
   trCurrent: number;
@@ -22,7 +33,8 @@ type State = {
   takeoverPeriod: number;
   trFee: number;
   trCosts: number;
-  discounter: number;
+  multiplierDiscounter: number;
+  investmentDiscounter: number;
   maxMultiplier: number;
   maturityRate: number;
   investors: Array<{
@@ -38,11 +50,11 @@ class App extends PureComponent<Props, State> {
     super(props);
 
     this.state = {
-      trCurrent: 10, trMaxAdoption: 10000000, curviness: 500, startOfFastGrowth: 10, takeoverPeriod: 24, trCosts: 0.1, trFee: 0.15, maxMultiplier: 10, maturityRate: 1000, discounter: 0.5,
+      trCurrent: 10, trMaxAdoption: 10000000, curviness: 500, startOfFastGrowth: 10, takeoverPeriod: 24, trCosts: 0.1, trFee: 0.15, maxMultiplier: 10, maturityRate: 5000, multiplierDiscounter: 0.001, investmentDiscounter: 0.001,
       investors: [
-        { investment: 100000, multiplier: 2, startingMonth: 0, returnReceived: 0, },
-        { investment: 900000, multiplier: 5, startingMonth: 16, returnReceived: 0, },
-        { investment: 250000, multiplier: 9, startingMonth: 0, returnReceived: 0, },
+        { investment: 500000, multiplier: 2, startingMonth: 0, returnReceived: 0, },
+        { investment: 500000, multiplier: 8, startingMonth: 0, returnReceived: 0, },
+        { investment: 250000, multiplier: 3, startingMonth: 16, returnReceived: 0, },
       ],
     };
   }
@@ -101,46 +113,42 @@ class App extends PureComponent<Props, State> {
     return curve;
   }
 
-  private investorsCurve(months: number) {
-    const { trFee, trCosts, discounter, maxMultiplier, maturityRate, investors } = this.state;
+  private calculateInvestmentWeight(params: InvestmentParams): number {
+    const t1 = (params.maxMultiplier - params.multiplier) * params.multiplierDiscounter;
+    const t2 = (params.investment / 1000) * params.investmentDiscounter;
+    const t3 = params.month * params.maturityRate;
+    const investmentWeight = (t1 * t2) + t3;
 
+    return investmentWeight;
+  }
+
+  private calculateInvestors(month: number, endGoals: number[], investorCurves: number[][], allWeights: number) {
+    const { trFee, trCosts, multiplierDiscounter, investmentDiscounter, maxMultiplier, maturityRate, investors } = this.state;
+    investors.forEach((investor, i) => {
+      if (month < investor.startingMonth + 1 || endGoals[i] <= 0) {
+        investorCurves[i].push(0);
+        return;
+      }
+
+      const weightShare = this.calculateInvestmentWeight({ maxMultiplier, multiplier: investor.multiplier, multiplierDiscounter, investment: investor.investment, investmentDiscounter, month, maturityRate }) / allWeights;
+      const res = (trFee - trCosts) * this.calcAdoption(month) * weightShare;
+
+      endGoals[i] -= res;
+      investorCurves[i].push(res);
+    });
+  }
+
+  private investorsCurve(months: number) {
+    const { multiplierDiscounter, investmentDiscounter, maxMultiplier, maturityRate, investors } = this.state;
     const endGoals = investors.map((investor) => investor.multiplier * investor.investment);
     const investorCurves: number[][] = investors.map(() => []);
 
-    const multiplierDiscounter = Math.max(0.1, 1 - discounter);
-    const investmentDiscounter = Math.max(0.1, discounter);
-
     for (let month = 0; month < months; month++) {
-      const allWeights = investors
-        .filter((investor, i) => endGoals[i] > 0 && month >= investor.startingMonth + 1)
-        .reduce((prev, curr) => {
-          const t1 = (maxMultiplier - curr.multiplier) * multiplierDiscounter;
-          const t2 = curr.investment * investmentDiscounter;
-          const t3 = month * maturityRate;
-          const investmentWeight = t1 * t2 + t3;
-          console.log('consts', t1, t2, t3);
+      const allWeights = investors.filter((investor, i) => endGoals[i] > 0 && month >= investor.startingMonth + 1).reduce((prev, curr) => {
+        return prev + this.calculateInvestmentWeight({ maxMultiplier, multiplier: curr.multiplier, multiplierDiscounter, investment: curr.investment, investmentDiscounter, month, maturityRate });
+      }, 0);
 
-          return prev + investmentWeight;
-        }, 0);
-
-      investors.forEach((investor, i) => {
-        if (month < investor.startingMonth + 1 || endGoals[i] <= 0) {
-          investorCurves[i].push(0);
-          return;
-        }
-
-        const ac = this.calcAdoption(month);
-        const t1 = (maxMultiplier - investor.multiplier) * multiplierDiscounter;
-        const t2 = investor.investment * investmentDiscounter;
-        const t3 = month * maturityRate;
-        const investmentWeight = t1 * t2 + t3;
-        const weightShare = investmentWeight / allWeights;
-
-        const res = (trFee - trCosts) * ac * weightShare;
-
-        endGoals[i] -= res;
-        investorCurves[i].push(res);
-      });
+      this.calculateInvestors(month, endGoals, investorCurves, allWeights);
     }
 
     return investorCurves;

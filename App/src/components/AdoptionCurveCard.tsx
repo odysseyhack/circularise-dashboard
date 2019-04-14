@@ -23,24 +23,27 @@ type Props = {
 
 export class AdoptionCurveCard extends PureComponent<Props> {
 
-  public render() {
-    const { trCurrent, trMaxAdoption, curviness, startOfFastGrowth, takeoverPeriod, onChange } = this.props;
+  private renderList() {
+    return (
+      <List>
+        <ListItem><Typography>Adoption Curve</Typography></ListItem>
+        <ListItem className={styles.label}><FormLabel>Current Transactions/month</FormLabel></ListItem>
+        <InputParamater value={this.props.trCurrent} onChange={(val) => { this.props.onChange('trCurrent', val); }} />
+        <ListItem className={styles.label}><FormLabel>Max Transactions/month</FormLabel></ListItem>
+        <InputParamater value={this.props.trMaxAdoption} onChange={(val) => { this.props.onChange('trMaxAdoption', val); }} />
+        <ListItem className={styles.label}><FormLabel>Curviness</FormLabel></ListItem>
+        <SliderParameter min={10} max={3000} value={this.props.curviness} onChange={(val) => { this.props.onChange('curviness', val); }} />
+        <ListItem className={styles.label}><FormLabel>Start Month Of Fast Growth</FormLabel></ListItem>
+        <SliderParameter min={1} max={36} value={this.props.startOfFastGrowth} onChange={(val) => { this.props.onChange('startOfFastGrowth', val); }} />
+        <ListItem className={styles.label}><FormLabel>Takeover Period</FormLabel></ListItem>
+        <SliderParameter min={1} max={60} value={this.props.takeoverPeriod} onChange={(val) => { this.props.onChange('takeoverPeriod', val); }} />
+      </List>);
+  }
 
+  public render() {
     return (
       <Card className={styles.card}>
-        <List>
-          <ListItem><Typography>Adoption Curve</Typography></ListItem>
-          <ListItem className={styles.label}><FormLabel>Current Transactions/month</FormLabel></ListItem>
-          <InputParamater value={trCurrent} onChange={(val) => { onChange('trCurrent', val); }} />
-          <ListItem className={styles.label}><FormLabel>Max Transactions/month</FormLabel></ListItem>
-          <InputParamater value={trMaxAdoption} onChange={(val) => { onChange('trMaxAdoption', val); }} />
-          <ListItem className={styles.label}><FormLabel>Curviness</FormLabel></ListItem>
-          <SliderParameter min={10} max={3000} value={curviness} onChange={(val) => { onChange('curviness', val); }} />
-          <ListItem className={styles.label}><FormLabel>Start Month Of Fast Growth</FormLabel></ListItem>
-          <SliderParameter min={1} max={36} value={startOfFastGrowth} onChange={(val) => { onChange('startOfFastGrowth', val); }} />
-          <ListItem className={styles.label}><FormLabel>Takeover Period</FormLabel></ListItem>
-          <SliderParameter min={1} max={60} value={takeoverPeriod} onChange={(val) => { onChange('takeoverPeriod', val); }} />
-        </List>
+        {this.renderList()}
       </Card>
     );
   }
