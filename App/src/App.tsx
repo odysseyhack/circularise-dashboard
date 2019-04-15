@@ -25,6 +25,11 @@ interface InvestmentParams {
   maturityRate: number;
 };
 
+export interface InfoItem {
+  title: string;
+  description: string;
+}
+
 type State = {
   trCurrent: number;
   trMaxAdoption: number;
@@ -42,7 +47,10 @@ type State = {
     multiplier: number;
     startingMonth: number;
     returnReceived: number;
+    color?: string;
   }>;
+
+
 };
 
 class App extends PureComponent<Props, State> {
@@ -58,13 +66,13 @@ class App extends PureComponent<Props, State> {
       trCosts: 0.1,
       trFee: 0.15,
       maxMultiplier: 10,
-      maturityRate: 5000,
+      maturityRate: 0,
       multiplierDiscounter: 0.001,
       investmentDiscounter: 0.001,
       investors: [
-        { investment: 500000, multiplier: 2, startingMonth: 0, returnReceived: 0, },
-        { investment: 500000, multiplier: 8, startingMonth: 0, returnReceived: 0, },
-        { investment: 250000, multiplier: 3, startingMonth: 16, returnReceived: 0, },
+        { investment: 500000, multiplier: 2, startingMonth: 0, returnReceived: 0, color: '#B76D68' },
+        { investment: 500000, multiplier: 8, startingMonth: 0, returnReceived: 0, color: '#8DAA91' },
+        { investment: 250000, multiplier: 3, startingMonth: 16, returnReceived: 0, color: '#39A16' },
       ],
     };
   }
@@ -170,12 +178,14 @@ class App extends PureComponent<Props, State> {
     const d1 = this.adoptionCurve();
     const d2 = this.returnOnInvestmentCurve();
     const d3 = this.investorsCurve(d2.length);
+    const { investors } = this.state;
 
     return (
       <main className={styles.content}>
         <Card className={styles.card}>
-          <CardContent>
+          <CardContent className={styles.graph}>
             <Line
+              height={130}
               options={{ maintainAspectRatio: true }}
               data={{
                 labels: d1.map((_, i) => i),
@@ -186,17 +196,18 @@ class App extends PureComponent<Props, State> {
             />
 
             <Line
+              height={130}
               options={{ maintainAspectRatio: true }}
               data={{
                 labels: d2.map((_, i) => i),
                 datasets: [
                   {
-                    label: 'Return On Investment', lineTension: 0.1, borderColor: '#4E97D5', backgroundColor: 'rgba(0,0,0,0)', data: d2,
+                    label: 'Return On Investment', lineTension: 0.1, borderColor: '#3568B5', backgroundColor: 'rgba(0,0,0,0)', data: d2,
                   },
                   ...d3.map((d, index) => ({
                     label: `Investor ${index + 1}`,
                     lineTension: 0.1,
-                    borderColor: `#9${index * 9}F`,
+                    borderColor: investors[index].color,
                     backgroundColor: 'rgba(0,0,0,0)',
                     data: d,
                   })),],

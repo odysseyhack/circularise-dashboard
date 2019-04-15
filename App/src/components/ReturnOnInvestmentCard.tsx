@@ -16,6 +16,8 @@ import styles from '../styles/drawers.module.scss';
 
 import { InputParamater } from './InputParamter';
 import { SliderParameter } from './SliderParameter';
+import { InfoItem } from '../App';
+import { InfoButton } from './InfoButton';
 
 type Investor = {
   investment: number;
@@ -41,6 +43,47 @@ type State = {
 };
 
 export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
+
+  private items: InfoItem[] = [
+    {
+      title: 'Transaction costs',
+      description: 'Expected costs of running a single transaction through the protocol',
+    },
+    {
+      title: 'Transaction fee',
+      description: 'Fee charged for a single transaction to users of the protocol',
+    },
+
+    {
+      title: 'Weight based on Investment',
+      description: 'Indicate if investors that funded higher amounts should get a preference when the income is distributed (higher is more preference)',
+    },
+    {
+      title: 'Weight based on Multiplier',
+      description: 'Indicate if investors that have chosen a lower multiplier should get a preference when the income is distributed (higher is more preference)',
+    },
+    {
+      title: 'Weight based on Maturity',
+      description: 'Indicate if investors that funded earlier should get a preference when the income is distributed (higher is more preference)',
+    },
+    {
+      title: 'Max Multiplier',
+      description: 'Maximum multiplier that investors can choose',
+    },
+    {
+      title: 'Starting Month',
+      description: 'Which month does the investment start?',
+    },
+    {
+      title: 'Investment',
+      description: 'The amount of money you will invest',
+    },
+    {
+      title: 'Multiplier',
+      description: 'The return on investment you expect',
+    },
+  ];
+
   constructor(props: Props) {
     super(props);
 
@@ -49,10 +92,11 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
     };
   }
 
-  private renderLabel(label: string) {
+  private renderLabel(infoItem: InfoItem) {
     return (
       <ListItem className={styles.label}>
-        <FormLabel>{label}</FormLabel>
+        <FormLabel>{infoItem.title}</FormLabel>
+        <InfoButton title={infoItem.title} description={infoItem.description} />
       </ListItem>
     );
   }
@@ -97,7 +141,7 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
           {/* Transaction Parameters */}
           {this.renderTitle('Transaction Parameters')}
 
-          {this.renderLabel('Transaction Costs')}
+          {this.renderLabel(this.items[0])}
           <SliderParameter
             value={trCosts}
             max={trFee - 0.001}
@@ -105,7 +149,7 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
             onChange={(val) => { onChange('trCosts', val); }}
           />
 
-          {this.renderLabel('Transaction Fee')}
+          {this.renderLabel(this.items[1])}
           <SliderParameter
             value={trFee}
             min={trCosts}
@@ -119,7 +163,7 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
           {/* Protocol Parameters */}
           {this.renderTitle('Protocol Parameters')}
 
-          {this.renderLabel('Weight based on Investment')}
+          {this.renderLabel(this.items[2])}
           <SliderParameter
             value={investmentDiscounter}
             min={0.001}
@@ -128,7 +172,7 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
             onChange={(val) => { onChange('investmentDiscounter', val); }}
           />
 
-          {this.renderLabel('Weight based on Multiplier')}
+          {this.renderLabel(this.items[3])}
           <SliderParameter
             value={multiplierDiscounter}
             min={0.001}
@@ -137,13 +181,20 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
             onChange={(val) => { onChange('multiplierDiscounter', val); }}
           />
 
-          {this.renderLabel('Maturity Rate per month')}
-          <InputParamater
+          {this.renderLabel(this.items[4])}
+          <SliderParameter
             value={maturityRate}
+            min={0}
+            max={10000000}
+            step={1000000}
             onChange={(val) => { onChange('maturityRate', val); }}
           />
+          {/* <InputParamater
+            value={maturityRate}
+            onChange={(val) => { onChange('maturityRate', val); }}
+          /> */}
 
-          {this.renderLabel('Max Multiplier')}
+          {this.renderLabel(this.items[5])}
           <InputParamater
             value={maxMultiplier}
             onChange={(val) => { onChange('maxMultiplier', val); }}
@@ -169,13 +220,13 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
           {investors.map((investor, i) => (
             this.state.selectedInvestor === i && <div key={i}>
 
-              {this.renderLabel('Starting Month')}
+              {this.renderLabel(this.items[6])}
               <InputParamater
                 value={investor.startingMonth}
                 onChange={(val) => { onInvestorChange(i, 'startingMonth', val); }}
               />
 
-              {this.renderLabel('Investment')}
+              {this.renderLabel(this.items[7])}
               <SliderParameter
                 min={10000}
                 max={1000000}
@@ -184,8 +235,7 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
                 onChange={(val) => { onInvestorChange(i, 'investment', val); }}
               />
 
-              {this.renderLabel('Multiplier')}
-
+              {this.renderLabel(this.items[8])}
               <SliderParameter
                 value={investor.multiplier}
                 min={1}
@@ -193,14 +243,14 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
                 onChange={(val) => { onInvestorChange(i, 'multiplier', val); }}
               />
 
-              <Button
+              {/* <Button
                 variant="contained"
                 color="secondary"
                 className={styles.button}
                 onClick={this.handleSubmit}
               >
                 Submit Investment
-              </Button>
+              </Button> */}
             </div>
           ))}
         </List>
