@@ -43,6 +43,7 @@ type State = {
   maxMultiplier: number;
   maturityRate: number;
   investors: Array<{
+    name: string;
     investment: number;
     multiplier: number;
     startingMonth: number;
@@ -66,13 +67,13 @@ class App extends PureComponent<Props, State> {
       trCosts: 0.1,
       trFee: 0.15,
       maxMultiplier: 10,
-      maturityRate: 0,
+      maturityRate: 5000,
       multiplierDiscounter: 0.001,
       investmentDiscounter: 0.001,
       investors: [
-        { investment: 500000, multiplier: 2, startingMonth: 0, returnReceived: 0, color: '#B76D68' },
-        { investment: 500000, multiplier: 8, startingMonth: 0, returnReceived: 0, color: '#8DAA91' },
-        { investment: 250000, multiplier: 3, startingMonth: 16, returnReceived: 0, color: '#39A16' },
+        { name: 'Alex', investment: 500000, multiplier: 2, startingMonth: 0, returnReceived: 0, color: '#B76D68' },
+        { name: 'Bernard', investment: 500000, multiplier: 8, startingMonth: 0, returnReceived: 0, color: '#8DAA91' },
+        { name: 'Charles', investment: 250000, multiplier: 3, startingMonth: 16, returnReceived: 0, color: '#039A16' },
       ],
     };
   }
@@ -115,7 +116,7 @@ class App extends PureComponent<Props, State> {
   }
 
   private returnOnInvestmentCurve() {
-    const { trFee, trCosts, investors, } = this.state;
+    const { trFee, trCosts, investors } = this.state;
 
     let endGoal = investors.reduce((prev, curr) => prev + curr.investment * curr.multiplier, 0);
     let t = 0;
@@ -135,23 +136,51 @@ class App extends PureComponent<Props, State> {
 
   private calculateInvestmentWeight(params: InvestmentParams): number {
     const t1 = (params.maxMultiplier - params.multiplier) * params.multiplierDiscounter;
-    const t2 = (params.investment / 1000) * params.investmentDiscounter;
+    // console.log('T1', t1);
+    const t2 = (params.investment / 100) * params.investmentDiscounter;
+    // console.log('T2', t2);
     const t3 = params.month * params.maturityRate;
-    const investmentWeight = (t1 * t2) + t3;
+    // console.log('T3', t3);
+    const investmentWeight = (t1 * t2) * t3;
 
     return investmentWeight;
   }
 
   private calculateInvestors(month: number, endGoals: number[], investorCurves: number[][], allWeights: number) {
-    const { trFee, trCosts, multiplierDiscounter, investmentDiscounter, maxMultiplier, maturityRate, investors } = this.state;
+    const {
+      trFee,
+      trCosts,
+      multiplierDiscounter,
+      investmentDiscounter,
+      maxMultiplier,
+      maturityRate,
+      investors,
+    } = this.state;
+
     investors.forEach((investor, i) => {
       if (month < investor.startingMonth + 1 || endGoals[i] <= 0) {
         investorCurves[i].push(0);
         return;
       }
 
-      const weightShare = this.calculateInvestmentWeight({ maxMultiplier, multiplier: investor.multiplier, multiplierDiscounter, investment: investor.investment, investmentDiscounter, month, maturityRate }) / allWeights;
+      console.log(`-------- Investor ${investor.name} -------`);
+
+      const investmentWeight = this.calculateInvestmentWeight(
+        {
+          maxMultiplier,
+          multiplier: investor.multiplier,
+          multiplierDiscounter,
+          investment: investor.investment,
+          investmentDiscounter,
+          month,
+          maturityRate,
+        });
+      console.log('Investment Weight', investmentWeight);
+      // console.log('All Weights', allWeights);
+      const weightShare = investmentWeight / allWeights;
+      console.log('Weight Share', weightShare);
       const res = (trFee - trCosts) * this.calcAdoption(month) * weightShare;
+      console.log('res', res);
 
       endGoals[i] -= res;
       investorCurves[i].push(res);
@@ -164,9 +193,21 @@ class App extends PureComponent<Props, State> {
     const investorCurves: number[][] = investors.map(() => []);
 
     for (let month = 0; month < months; month++) {
-      const allWeights = investors.filter((investor, i) => endGoals[i] > 0 && month >= investor.startingMonth + 1).reduce((prev, curr) => {
-        return prev + this.calculateInvestmentWeight({ maxMultiplier, multiplier: curr.multiplier, multiplierDiscounter, investment: curr.investment, investmentDiscounter, month, maturityRate });
-      }, 0);
+      console.log(`##### Month ${month} #####`);
+
+      const allWeights = investors.filter((investor, i) => endGoals[i] > 0 && month >= investor.startingMonth + 1)
+        .reduce((prev, curr) => {
+          return prev + this.calculateInvestmentWeight(
+            {
+              maxMultiplier,
+              multiplier: curr.multiplier,
+              multiplierDiscounter,
+              investment: curr.investment,
+              investmentDiscounter,
+              month,
+              maturityRate,
+            });
+        }, 0);
 
       this.calculateInvestors(month, endGoals, investorCurves, allWeights);
     }

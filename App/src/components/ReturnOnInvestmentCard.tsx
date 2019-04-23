@@ -182,17 +182,17 @@ export class ReturnOnInvestmentCard extends PureComponent<Props, State> {
           />
 
           {this.renderLabel(this.items[4])}
-          <SliderParameter
+          {/* <SliderParameter
             value={maturityRate}
             min={0}
             max={10000000}
             step={1000000}
             onChange={(val) => { onChange('maturityRate', val); }}
-          />
-          {/* <InputParamater
+          /> */}
+          <InputParamater
             value={maturityRate}
             onChange={(val) => { onChange('maturityRate', val); }}
-          /> */}
+          />
 
           {this.renderLabel(this.items[5])}
           <InputParamater
